@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+
+		<script src="js/keys.js"></script>
+		<script src="js/tween.js"></script>
+		<script src="classes/plataform.js"></script>
+		<script src="classes/players.js"></script>
+		<script src="js/input.js"></script>
+		<script src="js/three.js"></script>
+		<script src="js/cannon.js"></script>
+		<script src="js/detector.js"></script>
+		<script>
+			var tween = new TWEEN.Tween({});
+			</script>
+        <script>
+						var deformSpeed=0
+						var dAcceleration=.01;
+						//vertical velocity
+						var jumpVelocity = 3;
+						var maxAltitude=2;
+						var ySpeed=0;
+
+
+			
+						
+						// horizontal velocity
+						var xSpeed = 0;
+						var xAcceleration = 0.01;
+						var maxSpeed = 0.2;
+
+			var touchFloor=false;
+			
+			var world;
+			var dt = 1 / 60;
+	
+			var constraintDown = false;
+			var camera, scene, renderer, gplane=false, clickMarker=false;
+			var geometry, material, mesh;
+			var controls,time = Date.now();
+	
+			var jointBody, constrainedBody, mouseConstraint;
+	
+			var N = 1;
+	
+			var container, camera, scene, renderer, projector;
+	
+			// To be synced
+			var meshes=[];
+	
+			// Initialize Three.js
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			
+			// Variables de simulación
+			var gravity = new THREE.Vector3(0, -0.01, 0);
+			let position = new THREE.Vector3(0, 0, 0);
+			var velocity = new THREE.Vector3();
+			var maxVelocity = 1;
+			var moveSpeed=1;
+			var jumpVelocity = 10;
+
+
+			
+			init();
+			var geometry3 = new THREE.BoxGeometry(1, 1, 1);
+			var material3 = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+			cubeMesh = new THREE.Mesh(geometry3, material3);
+			cubeMesh.position.set(0, 5, 0); 
+			meshes.push(cubeMesh);
+			scene.add(meshes[0]);
+			// floor
+			const Plataform=new plataform();
+			const Plataform2=new plataform();
+			Plataform.setPosition(0,5,10);
+			Plataform.setGeometry(1,4,1);
+			Plataform2.setPosition(0,-1,0);
+
+			var platforms = [Plataform2,Plataform];
+
+			animate();
+			// Agregar una variable de estado para rastrear si el objeto está actualmente en una animación
+			var isAnimating = false;
+
+			function distortObject(object) {
+				var isAnimating = false;
+				var scale = { x: object.scale.x, y: object.scale.y, z: object.scale.z };
+				var targetScale = { x: 1.5, y: 0.5, z: 1.5 };
+				
+				// Cree una nueva animación Tween para la escala del objeto
+				var scaleTween = new TWEEN.Tween(scale)
+				  .to(targetScale, 1000) // El cambio de escala tarda 1000 milisegundos
+				  .easing(TWEEN.Easing.Elastic.Out) // Añade una curva de animación suave
+				  .onUpdate(function() {
+					object.scale.set(scale.x, scale.y, scale.z);
+				  })
+				
+				// Inicia la animación de cambio de escala
+				scaleTween.start();
+			  }
+			  
+
+			  function applyImpactDistortion(cube, duration, distortionAmountX,distortionAmountY,distortionAmountZ) {
+				// Guardar la escala original del cubo
+				var originalScale = { x: cube.scale.x, y: cube.scale.y, z: cube.scale.z };
+
+				var targetScale = { x: distortionAmountX, y: distortionAmountY, z:distortionAmountZ};
+
+				// Crear la animación de distorsión
+				const tween = new TWEEN.Tween(targetScale)
+				  .to(targetScale, duration)
+				  .easing(TWEEN.Easing.Quadratic.Out)
+				  .onUpdate(() => {
+					// Actualizar la escala del cubo en cada frame de la animación
+					cube.scale.set(targetScale.x, targetScale.y, targetScale.z);
+				  })
+				  .start();
+				  
+				// Crear la animación de regreso a la escala original
+				const tweenBack = new TWEEN.Tween(originalScale)
+				  .to(originalScale, duration)
+				  .easing((t) => Math.sin(t * Math.PI / 2))
+				  .onUpdate(() => {
+					// Actualizar la escala del cubo en cada frame de la animación
+					cube.scale.set(originalScale.x, originalScale.y, originalScale.z);
+				  });
+				
+				// Encadenar las animaciones de distorsión y regreso
+				tween.chain(tweenBack);
+				
+				// Retornar las animaciones para poder detenerlas si es necesario
+				
+				return {tween, tweenBack};
+			  }
+			  
+		
+	
+			function init() {
+	
+				projector = new THREE.Projector();
+	
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+	
+				// scene
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x000000, 500, 10000 );
+	
+				// camera
+				camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.5, 10 );
+				camera.position.set(10, 2, 0);
+				camera.quaternion.setFromAxisAngle(new THREE.Vector3(0,1,0), Math.PI/2);
+
+				scene.add(camera);
+	
+				// lights
+				var light, materials;
+				scene.add( new THREE.AmbientLight( 0x666666 ) );
+	
+				light = new THREE.DirectionalLight( 0xffffff, 1.75 );
+				var d = 20;
+	
+				light.position.set( d, d, d );
+	
+				light.castShadow = true;
+				//light.shadowCameraVisible = true;
+	
+				light.shadowMapWidth = 1024;
+				light.shadowMapHeight = 1024;
+	
+				light.shadowCameraLeft = -d;
+				light.shadowCameraRight = d;
+				light.shadowCameraTop = d;
+				light.shadowCameraBottom = -d;
+	
+				light.shadowCameraFar = 3*d;
+				light.shadowCameraNear = d;
+				light.shadowDarkness = 0.5;
+	
+				scene.add( light );
+
+
+
+	
+				
+
+
+
+				
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( scene.fog.color );
+	
+				container.appendChild( renderer.domElement );
+	
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.shadowMapEnabled = true;
+	
+				window.addEventListener( 'resize', onWindowResize, false );
+
+		
+			}
+		
+	
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				//controls.handleResize();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+
+
+			var yAcceleration = 0.03;
+			var originY=0;
+			var finalY=0;
+			var leftPlayer=false;
+			var rightPlayer=false;
+
+
+
+
+
+			function updatePhysics(platforms){
+				velocity.add(gravity);
+			
+				// Limitar la velocidad máxima del objeto
+				if (velocity.length() > maxVelocity) {
+					velocity.normalize().multiplyScalar(maxVelocity);
+				}
+			
+				// Mover el objeto según su velocidad
+				meshes[0].position.add(velocity);
+			
+				// Verificar la colisión con cada objeto de la clase "plataform"
+				for (const element of platforms) {
+					var platform = element;
+					var raycaster = new THREE.Raycaster(meshes[0].position, new THREE.Vector3(0, -1, 0), 0, .5);
+					var intersects = raycaster.intersectObject(platform.mesh);
+					if (intersects.length > 0) {
+						console.log("tocado");
+						touchFloor=true;                    
+						ySpeed=0;
+						velocity.y = 0;
+						meshes[0].position.setY(intersects[0].point.y + .5); // Ajustar la posición del objeto
+						break; // Salir del bucle si hay una colisión
+					} else {
+						touchFloor=false;
+
+					}
+				}
+
+			}
+			
+	
+			function render() {
+				renderer.render(scene, camera);
+			}
+	
+		
+	
+	
+	
+			
+        </script>
+
+	</body>
+</html>
