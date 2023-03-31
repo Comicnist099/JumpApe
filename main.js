@@ -18,6 +18,8 @@ if (!Detector.webgl)
 
 
 
+var sumador = 0;
+
 // GRAVEDAD
 var gravity = new THREE.Vector3(0, -0.01, 0);
 
@@ -35,9 +37,34 @@ Plataform.setPosition(0, 5, 10);
 Plataform.setGeometry(1, 4, 1);
 Plataform2.setPosition(0, -1, 0);
 
+
 var platforms = [Plataform2, Plataform];
 
+/* // //Importar
+var textureLoader = new THREE.TextureLoader();
+
+// Carga la imagen del fondo
+textureLoader.load('./assets/img/chango.png', function (texture) { // Configura la propiedad background de la escena con la textura cargada
+    scene.background = texture;
+}); */
+var loader = new FBXLoader();
+var MonkeyFBX;
+loader.load('./assets/models/Monkey2/Monkey.fbx', (fbx) => {
+    MonkeyFBX = fbx;
+    MonkeyFBX.scale.set(.0015, .0015, .0015);
+    MonkeyFBX.rotation.z = Math.PI / 2;
+    MonkeyFBX.position.set(0, 0, 0);
+    MonkeyFBX.quaternion.setFromAxisAngle(new THREE.Vector3(0, 0, 0), -Math.PI / 2);
+    console.log(MonkeyFBX);
+    scene.add(MonkeyFBX);
+
+}, undefined, (error) => {
+    console.error('Error al cargar el modelo FBX:', error);
+});
+
+
 animate();
+
 // Agregar una variable de estado para rastrear si el objeto está actualmente en una animación
 function applyImpactDistortion(cube, duration, distortionAmountX, distortionAmountY, distortionAmountZ) { // Guardar la escala original del cubo
     var originalScale = {
@@ -79,7 +106,7 @@ function init() {
     scene.fog = new THREE.Fog(0x000000, 500, 10000);
 
     // camera
-    camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.5, 10);
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.5, 14);
     camera.position.set(10, 2, 0);
     camera.quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2);
 
@@ -91,7 +118,7 @@ function init() {
     scene.add(new THREE.AmbientLight(0x666666));
 
     light = new THREE.DirectionalLight(0xffffff, 1.75);
-    var d = 20;
+    var d = 100;
 
     light.position.set(d, d, d);
 
@@ -141,9 +168,34 @@ function updatePhysics(platforms) {
 
 
 function animate() {
+
     TWEEN.update(); // Log de la posición actual del objeto
     updatePhysics(platforms);
-    player1.input(camera, Key.SPACE, Key.A, Key.D);
+
+    if (MonkeyFBX) {
+
+
+        console.log(`Posición del modelo: (${
+            MonkeyFBX.position.x
+        }, ${
+            MonkeyFBX.position.y
+        }, ${
+            MonkeyFBX.position.z
+        })`);
+    } else {
+        console.warn('El modelo aún no se ha cargado');
+    }
+
+
+    if (player1.getPositionY() >= player2.getPositionY()) {
+        camera.position.copy(player1.getPosition());
+        camera.position.add(new THREE.Vector3(10, 2, 0));
+        camera.lookAt(player1.getPosition());
+    } else {
+        camera.position.copy(player2.getPosition());
+        camera.position.add(new THREE.Vector3(10, 2, 0));
+        camera.lookAt(player2.getPosition());
+    } player1.input(camera, Key.SPACE, Key.A, Key.D);
     player2.input(camera, Key.UP, Key.LEFT, Key.RIGHT);
     // console.log(player1.getPosition());
 
@@ -155,6 +207,7 @@ function animate() {
     render();
 }
 
-function render() {
+function render() { // Actualizar la posición del objeto del HUD para que siga a la cámara
+
     renderer.render(scene, camera);
 }

@@ -4,6 +4,7 @@ export class players {
 
 
     constructor(x, y, z, size, color) {
+
         this.yAcceleration = 0.03;
         this.ySpeed = 0;
         this.xSpeed = 0;
@@ -30,6 +31,10 @@ export class players {
     getPosition() {
         return this.mesh.position;
     }
+    getPositionY() {
+        return this.mesh.position.y;
+    }
+
 
     getSize() {
         return this.geometry.parameters.width;

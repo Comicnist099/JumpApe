@@ -4,7 +4,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.mod
 export class platform {
     constructor(scene) {
         this.scene = scene;
-        this.geometry = new THREE.BoxGeometry(1, 17, 7);
+        this.geometry = new THREE.BoxGeometry(1, 17, 1);
         this.material = new THREE.MeshLambertMaterial({color: 0x777777});
         this.markerMaterial = new THREE.MeshLambertMaterial({color: 0xff0000});
         this.mesh = new THREE.Mesh(this.geometry, this.material);
