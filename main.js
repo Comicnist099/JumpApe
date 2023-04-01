@@ -18,17 +18,82 @@ if (!Detector.webgl)
 
 
 
-var sumador = 0;
-
 // GRAVEDAD
 var gravity = new THREE.Vector3(0, -0.01, 0);
 
-// /// JUGADORES
-const player1 = new players(0, 5, 0, 1, "red");
-scene.add(player1.getMesh());
 
-const player2 = new players(0, 7, 0, 1, "blue");
-scene.add(player2.getMesh());
+var player1,
+    player2;
+
+
+var loader = new FBXLoader();
+var MonkeyFBX;
+var cargadoModel = false;
+var mixer;
+var mixer2;
+
+loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
+    MonkeyFBX = fbx;
+    MonkeyFBX.scale.set(.0015, .0015, .0015);
+    // Crear el objeto Mixer para reproducir las animaciones del modelo
+    mixer2 = new THREE.AnimationMixer(MonkeyFBX);
+
+    // Obtener la animación del modelo y crear una instancia de la animación
+    var idleAnimation = mixer2.clipAction(MonkeyFBX.animations[0]);
+    MonkeyFBX.traverse(child => {
+        if (child.isMesh) {
+            child.AmbientLighty = -10;
+            child.material.transparent = false; // Hacer el material transparente
+            child.material.side = THREE.DoubleSide; // Configurar la visualización de las caras del material
+            child.material.metalness = 0.8; // Configurar la reflectividad del material
+            child.material.roughness = 0.2; // Configurar la suavidad del material
+            child.material.envMapIntensity = 1; // Configurar la intensidad del mapa de entorno del material
+            child.material.needsUpdate = true; // Asegurarse de que el material se actualice correctamente
+
+        }
+    });
+
+    player2 = new players(0, 5, 0, MonkeyFBX)
+    scene.add(player2.getMesh());
+    cargadoModel = true;
+    idleAnimation.play();
+}, undefined, (error) => {
+    console.error('Error al cargar el modelo FBX:', error);
+});
+
+
+loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
+    MonkeyFBX = fbx;
+    MonkeyFBX.scale.set(.0015, .0015, .0015);
+    // Crear el objeto Mixer para reproducir las animaciones del modelo
+    mixer = new THREE.AnimationMixer(MonkeyFBX);
+
+    // Obtener la animación del modelo y crear una instancia de la animación
+    var idleAnimation = mixer.clipAction(MonkeyFBX.animations[0]);
+    MonkeyFBX.traverse(child => {
+        if (child.isMesh) {
+            child.AmbientLighty = -10;
+            child.material.transparent = false; // Hacer el material transparente
+            child.material.side = THREE.DoubleSide; // Configurar la visualización de las caras del material
+            child.material.metalness = 0.8; // Configurar la reflectividad del material
+            child.material.roughness = 0.2; // Configurar la suavidad del material
+            child.material.envMapIntensity = 1; // Configurar la intensidad del mapa de entorno del material
+            child.material.needsUpdate = true; // Asegurarse de que el material se actualice correctamente
+
+        }
+    });
+
+    player1 = new players(0, 5, 0, MonkeyFBX)
+    scene.add(player1.getMesh());
+    cargadoModel = true;
+    idleAnimation.play();
+}, undefined, (error) => {
+    console.error('Error al cargar el modelo FBX:', error);
+});
+
+
+// /// JUGADORES
+
 
 // //// PLATAFORMAS
 const Plataform = new platform(scene);
@@ -47,21 +112,6 @@ var textureLoader = new THREE.TextureLoader();
 textureLoader.load('./assets/img/chango.png', function (texture) { // Configura la propiedad background de la escena con la textura cargada
     scene.background = texture;
 }); */
-var loader = new FBXLoader();
-var MonkeyFBX;
-loader.load('./assets/models/Monkey2/Monkey.fbx', (fbx) => {
-    MonkeyFBX = fbx;
-    MonkeyFBX.scale.set(.0015, .0015, .0015);
-    MonkeyFBX.rotation.z = Math.PI / 2;
-    MonkeyFBX.position.set(0, 0, 0);
-    MonkeyFBX.quaternion.setFromAxisAngle(new THREE.Vector3(0, 0, 0), -Math.PI / 2);
-    console.log(MonkeyFBX);
-    scene.add(MonkeyFBX);
-
-}, undefined, (error) => {
-    console.error('Error al cargar el modelo FBX:', error);
-});
-
 
 animate();
 
@@ -103,7 +153,8 @@ function init() {
 
     // scene
     scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x000000, 500, 10000);
+    scene.fog = new THREE.Fog(0x000000, 500, 1000);
+
 
     // camera
     camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.5, 14);
@@ -117,8 +168,8 @@ function init() {
         materials;
     scene.add(new THREE.AmbientLight(0x666666));
 
-    light = new THREE.DirectionalLight(0xffffff, 1.75);
-    var d = 100;
+    light = new THREE.DirectionalLight(0xffffff, 1);
+    var d = 20;
 
     light.position.set(d, d, d);
 
@@ -170,41 +221,29 @@ function updatePhysics(platforms) {
 function animate() {
 
     TWEEN.update(); // Log de la posición actual del objeto
-    updatePhysics(platforms);
+    if (cargadoModel) {
+        updatePhysics(platforms);
+        mixer.update(0.016);
+        mixer2.update(0.016);
 
-    if (MonkeyFBX) {
-
-
-        console.log(`Posición del modelo: (${
-            MonkeyFBX.position.x
-        }, ${
-            MonkeyFBX.position.y
-        }, ${
-            MonkeyFBX.position.z
-        })`);
-    } else {
-        console.warn('El modelo aún no se ha cargado');
+        if (player1.getPositionY() >= player2.getPositionY()) {
+            camera.position.copy(player1.getPosition());
+            camera.position.add(new THREE.Vector3(10, 2, 0));
+            camera.lookAt(player1.getPosition());
+        } else {
+            camera.position.copy(player2.getPosition());
+            camera.position.add(new THREE.Vector3(10, 2, 0));
+            camera.lookAt(player2.getPosition());
+        } player1.input(Key.SPACE, Key.A, Key.D);
+        player2.input(Key.UP, Key.LEFT, Key.RIGHT);
     }
-
-
-    if (player1.getPositionY() >= player2.getPositionY()) {
-        camera.position.copy(player1.getPosition());
-        camera.position.add(new THREE.Vector3(10, 2, 0));
-        camera.lookAt(player1.getPosition());
-    } else {
-        camera.position.copy(player2.getPosition());
-        camera.position.add(new THREE.Vector3(10, 2, 0));
-        camera.lookAt(player2.getPosition());
-    } player1.input(camera, Key.SPACE, Key.A, Key.D);
-    player2.input(camera, Key.UP, Key.LEFT, Key.RIGHT);
-    // console.log(player1.getPosition());
-
     // Renderizado de la escena
     renderer.render(scene, camera);
 
     // Llamada a la función para el siguiente frame de animación
     requestAnimationFrame(animate);
     render();
+
 }
 
 function render() { // Actualizar la posición del objeto del HUD para que siga a la cámara

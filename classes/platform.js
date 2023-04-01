@@ -1,12 +1,11 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
-
+import {FBXLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/FBXLoader.js';
 
 export class platform {
     constructor(scene) {
         this.scene = scene;
         this.geometry = new THREE.BoxGeometry(1, 17, 1);
         this.material = new THREE.MeshLambertMaterial({color: 0x777777});
-        this.markerMaterial = new THREE.MeshLambertMaterial({color: 0xff0000});
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         this.mesh.castShadow = true;
         this.mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2);

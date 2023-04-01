@@ -3,7 +3,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.mod
 export class players {
 
 
-    constructor(x, y, z, size, color) {
+    constructor(x, y, z, fbxModel) {
 
         this.yAcceleration = 0.03;
         this.ySpeed = 0;
@@ -15,15 +15,25 @@ export class players {
         this.veces = 0;
         this.velocity = new THREE.Vector3(0, 0, 0);
         this.maxVelocity = 1;
+        this.rotation = -0.5;
 
-
+        /* 
         this.geometry = new THREE.BoxGeometry(size, size, size);
         this.material = new THREE.MeshBasicMaterial({color: color});
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         this.mesh.position.set(x, y, z);
         this.mesh.castShadow = true;
         this.mesh.quaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2);
-        this.mesh.receiveShadow = true;
+        this.mesh.receiveShadow = true; */
+
+        this.mesh = fbxModel;
+        this.mesh.quaternion.setFromAxisAngle(new THREE.Vector3(0, 0, 0), Math.PI);
+        this.mesh.position.set(x, y, z);
+        this.mesh.scale.set(0.001, 0.001, 0.001);
+
+
+        // Agregar el objeto a la escena
+
 
         // Agregar el objeto a la escena
     }
@@ -81,10 +91,10 @@ export class players {
 
         return {tween, tweenBack};
     }
-    input(camera, JUMP, LEFT, RIGHT) {
+    input(JUMP, LEFT, RIGHT) {
         if (this.touchFloor) {
             if (this.veces == 0 && this.PressJump == false) {
-                this.applyImpactDistortion(this.mesh, 75, 1, 1.2, .8);
+                this.applyImpactDistortion(this.mesh, 75, .001, .0008, .0012);
                 this.veces = 1;
             }
         }
@@ -108,10 +118,18 @@ export class players {
         // Actualización de la velocidad en x
         if (Key.isDown(LEFT)) {
             this.xSpeed = Math.max(this.xSpeed - this.xAcceleration, this.maxSpeed);
+
+            this.mesh.quaternion.setFromAxisAngle(new THREE.Vector3(0, 0, 0), Math.PI);
+
+
         } else if (Key.isDown(RIGHT)) {
             this.xSpeed = Math.min(this.xSpeed + this.xAcceleration, -this.maxSpeed);
+            this.mesh.quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
+
         } else {
             this.xSpeed = Math.abs(this.xSpeed) < this.xAcceleration ? 0 : this.xSpeed - Math.sign(this.xSpeed) * this.xAcceleration;
+            this.mesh.quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2);
+
         }
         this.mesh.position.z += this.xSpeed * .5;
         this.mesh.position.y += this.ySpeed;
