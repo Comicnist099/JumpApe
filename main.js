@@ -27,19 +27,31 @@ var player1,
 
 
 var loader = new FBXLoader();
+var animLoader = new FBXLoader();
+
 var MonkeyFBX;
-var cargadoModel = false;
+
+var cargadoModel = false,
+    cargadoAnim = false;
+
+
 var mixer;
-var mixer2;
+var mixer2
+var mixer3;
 
 loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
+    var animations = [];
     MonkeyFBX = fbx;
     MonkeyFBX.scale.set(.0015, .0015, .0015);
     // Crear el objeto Mixer para reproducir las animaciones del modelo
     mixer2 = new THREE.AnimationMixer(MonkeyFBX);
+    var run = mixer2.clipAction(MonkeyFBX.animations[0]);
+    var idle = mixer2.clipAction(MonkeyFBX.animations[1]);
+
+    animations.push(run);
+    animations.push(idle);
 
     // Obtener la animación del modelo y crear una instancia de la animación
-    var idleAnimation = mixer2.clipAction(MonkeyFBX.animations[0]);
     MonkeyFBX.traverse(child => {
         if (child.isMesh) {
             child.AmbientLighty = -10;
@@ -53,23 +65,30 @@ loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
         }
     });
 
-    player2 = new players(0, 5, 0, MonkeyFBX)
+
+    player2 = new players(0, 5, 0, MonkeyFBX, animations)
     scene.add(player2.getMesh());
     cargadoModel = true;
-    idleAnimation.play();
+
+
 }, undefined, (error) => {
     console.error('Error al cargar el modelo FBX:', error);
 });
 
 
 loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
+    var animations = [];
     MonkeyFBX = fbx;
     MonkeyFBX.scale.set(.0015, .0015, .0015);
     // Crear el objeto Mixer para reproducir las animaciones del modelo
     mixer = new THREE.AnimationMixer(MonkeyFBX);
+    var run = mixer.clipAction(MonkeyFBX.animations[0]);
+    var idle = mixer.clipAction(MonkeyFBX.animations[1]);
+
+    animations.push(run);
+    animations.push(idle);
 
     // Obtener la animación del modelo y crear una instancia de la animación
-    var idleAnimation = mixer.clipAction(MonkeyFBX.animations[0]);
     MonkeyFBX.traverse(child => {
         if (child.isMesh) {
             child.AmbientLighty = -10;
@@ -83,10 +102,12 @@ loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
         }
     });
 
-    player1 = new players(0, 5, 0, MonkeyFBX)
+
+    player1 = new players(0, 5, 0, MonkeyFBX, animations)
     scene.add(player1.getMesh());
     cargadoModel = true;
-    idleAnimation.play();
+
+
 }, undefined, (error) => {
     console.error('Error al cargar el modelo FBX:', error);
 });
@@ -225,6 +246,7 @@ function animate() {
         updatePhysics(platforms);
         mixer.update(0.016);
         mixer2.update(0.016);
+
 
         if (player1.getPositionY() >= player2.getPositionY()) {
             camera.position.copy(player1.getPosition());

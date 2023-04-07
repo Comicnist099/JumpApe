@@ -3,13 +3,13 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.mod
 export class players {
 
 
-    constructor(x, y, z, fbxModel) {
+    constructor(x, y, z, fbxModel, animations) {
 
         this.yAcceleration = 0.03;
         this.ySpeed = 0;
         this.xSpeed = 0;
-        this.xAcceleration = 0.01;
-        this.maxSpeed = 0.2;
+        this.xAcceleration = 0.02;
+        this.maxSpeed = .3;
         this.touchFloor = false;
         this.PressJump = false;
         this.veces = 0;
@@ -31,11 +31,17 @@ export class players {
         this.mesh.position.set(x, y, z);
         this.mesh.scale.set(0.001, 0.001, 0.001);
 
+        this.animations = []
+        this.animations = animations;
+
 
         // Agregar el objeto a la escena
 
 
         // Agregar el objeto a la escena
+    }
+    setMesh(mesh) {
+        this.mesh = mesh;
     }
 
     getPosition() {
@@ -117,16 +123,22 @@ export class players {
         }
         // Actualización de la velocidad en x
         if (Key.isDown(LEFT)) {
+            this.animations[1].stop();
+            this.animations[0].play();
             this.xSpeed = Math.max(this.xSpeed - this.xAcceleration, this.maxSpeed);
 
             this.mesh.quaternion.setFromAxisAngle(new THREE.Vector3(0, 0, 0), Math.PI);
 
 
         } else if (Key.isDown(RIGHT)) {
+            this.animations[1].stop();
+            this.animations[0].play();
             this.xSpeed = Math.min(this.xSpeed + this.xAcceleration, -this.maxSpeed);
             this.mesh.quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI);
 
         } else {
+            this.animations[0].stop();
+            this.animations[1].play();
             this.xSpeed = Math.abs(this.xSpeed) < this.xAcceleration ? 0 : this.xSpeed - Math.sign(this.xSpeed) * this.xAcceleration;
             this.mesh.quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2);
 
