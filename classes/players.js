@@ -105,7 +105,6 @@ export class players {
             }
         }
 
-        console.log(this.mesh.position);
 
         /*      // Actualización de la velocidad en y
         camera.position.copy(this.mesh.position);
@@ -149,31 +148,53 @@ export class players {
     }
 
     gravity(platforms, gravity) {
-        this.velocity.add(gravity);
+        if (!this.touchFloor) {
+            this.velocity.add(gravity);
 
-        // Limitar la velocidad máxima del objeto
-        if (this.velocity.length() > this.maxVelocity) {
-            this.velocity.normalize().multiplyScalar(this.maxVelocity);
+
+            // Limitar la velocidad máxima del objeto
+            if (this.velocity.length() > this.maxVelocity) {
+                this.velocity.normalize().multiplyScalar(this.maxVelocity);
+            }
+            this.mesh.position.add(this.velocity);
+
+
         }
+        var Jy1 = this.mesh.position.y
+        var Jy2 = this.mesh.scale.y + this.mesh.position.y;
+        var Jz1 = this.mesh.position.z
+        var Jz2 = this.mesh.scale.z + this.mesh.position.z;
 
-        this.mesh.position.add(this.velocity);
         // Verificar la colisión con cada objeto de la clase "plataform"
         for (const element of platforms) {
             var platform = element;
-            var raycaster = new THREE.Raycaster(this.mesh.position, new THREE.Vector3(0, -1, 0), 0, .5);
-            var intersects = raycaster.intersectObject(platform.mesh);
-            if (intersects.length > 0) {
+
+            const box = new THREE.Box3().setFromObject(platform.mesh);
+            const width = box.max.x - box.min.x;
+
+
+            var Py1 = platform.mesh.position.y
+            var Py2 = platform.mesh.scale.y + platform.mesh.position.y;
+            var Pz1 = platform.mesh.position.z - width * 2.3;
+            var Pz2 = platform.mesh.position.z + width * 2.3;
+            console.log(platform.mesh.position);
+            console.log(Pz1, Pz2);
+            console.log(Jz1, Jz2)
+
+
+            if (Jy2 < Py1 + 1 && Jy1 > Py2 && Jz2 > Pz1 && Jz1 < Pz2) {
+
                 console.log("tocado");
                 this.touchFloor = true;
                 this.ySpeed = 0;
                 this.velocity.y = 0;
-                this.mesh.position.setY(intersects[0].point.y + .5); // Ajustar la posición del objeto
-                break; // Salir del bucle si hay una colisión
+                this.mesh.position.setY(Py1 + 1); // Ajustar la posición del objeto
+                break; // Salir del bucle si hay una colisión                }
             } else {
                 this.touchFloor = false;
 
-            }
 
+            }
         }
     }
 }

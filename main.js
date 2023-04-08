@@ -39,6 +39,47 @@ var mixer;
 var mixer2
 var mixer3;
 
+var Plataform1,
+    Plataform2;
+
+var PlatfomsScena = false;
+var platforms;
+
+loader.load('./assets/models/Platforms/Wood.fbx', (fbx) => {
+    var wood = fbx;
+    wood.scale.set(.015, .015, .015);
+    // Crear el objeto Mixer para reproducir las animaciones del modelo
+
+    // Obtener la animación del modelo y crear una instancia de la animación
+    wood.traverse(child => {
+        if (child.isMesh) {
+            child.AmbientLighty = -10;
+            child.material.transparent = false; // Hacer el material transparente
+            child.material.side = THREE.DoubleSide; // Configurar la visualización de las caras del material
+            child.material.metalness = 0.8; // Configurar la reflectividad del material
+            child.material.roughness = 0.2; // Configurar la suavidad del material
+            child.material.envMapIntensity = 1; // Configurar la intensidad del mapa de entorno del material
+            child.material.needsUpdate = true; // Asegurarse de que el material se actualice correctamente
+
+        }
+    });
+
+
+    const geometry = wood.children[0].geometry;
+    Plataform2 = new platform(scene, wood, geometry, 0, 0, 0);
+    Plataform2.setGeometry(1, 6, 1);
+
+    const wood2 = wood.clone();
+    Plataform1 = new platform(scene, wood2, geometry, 0, 5, 4);
+    Plataform2.setGeometry(1, 2, 1);
+
+    platforms = [Plataform2, Plataform1];
+    PlatfomsScena = true;
+}, undefined, (error) => {
+    console.error('Error al cargar el modelo FBX:', error);
+});
+
+
 loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
     var animations = [];
     MonkeyFBX = fbx;
@@ -117,14 +158,7 @@ loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
 
 
 // //// PLATAFORMAS
-const Plataform = new platform(scene);
-const Plataform2 = new platform(scene);
-Plataform.setPosition(0, 5, 10);
-Plataform.setGeometry(1, 4, 1);
-Plataform2.setPosition(0, -1, 0);
 
-
-var platforms = [Plataform2, Plataform];
 
 /* // //Importar
 var textureLoader = new THREE.TextureLoader();
@@ -178,7 +212,7 @@ function init() {
 
 
     // camera
-    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.5, 14);
+    camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.5, 14);
     camera.position.set(10, 2, 0);
     camera.quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2);
 
@@ -227,10 +261,10 @@ function onWindowResize() {
 
 
 function updatePhysics(platforms) {
-
-
-    player1.gravity(platforms, gravity);
-    player2.gravity(platforms, gravity);
+    if (PlatfomsScena) {
+        player1.gravity(platforms, gravity);
+        player2.gravity(platforms, gravity);
+    }
 
 
     // Mover el objeto según su velocidad
