@@ -3,6 +3,7 @@ init();
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
 import {platform} from './classes/platform.js';
 import {players} from './classes/players.js';
+import {wall} from './classes/wall.js';
 import {FBXLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/FBXLoader.js';
 import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js';
 import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
@@ -10,8 +11,10 @@ import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/j
 
 var container,
     camera,
+    camera2,
     scene,
-    renderer;
+    renderer,
+    renderer2;
 
 if (!Detector.webgl) 
     Detector.addGetWebGLMessage();
@@ -40,17 +43,17 @@ var mixer2
 var mixer3;
 
 var Plataform1,
-    Plataform2;
+    Plataform2,
+    Plataform3,
+    wall1;
 
 var PlatfomsScena = false;
-var platforms;
+var platforms = [],
+    walls = [];
 
 loader.load('./assets/models/Platforms/Wood.fbx', (fbx) => {
     var wood = fbx;
-    wood.scale.set(.015, .015, .015);
-    // Crear el objeto Mixer para reproducir las animaciones del modelo
-
-    // Obtener la animación del modelo y crear una instancia de la animación
+    wood.scale.set(.015, .010, .015);
     wood.traverse(child => {
         if (child.isMesh) {
             child.AmbientLighty = -10;
@@ -63,17 +66,27 @@ loader.load('./assets/models/Platforms/Wood.fbx', (fbx) => {
 
         }
     });
-
-
     const geometry = wood.children[0].geometry;
+
+    // PLATAFORMAS
+    wood.scale.set(.015, .010, .03);
     Plataform2 = new platform(scene, wood, geometry, 0, 0, 0);
-    Plataform2.setGeometry(1, 6, 1);
 
     const wood2 = wood.clone();
+    wood2.scale.set(.015, .010, .013);
     Plataform1 = new platform(scene, wood2, geometry, 0, 5, 4);
-    Plataform2.setGeometry(1, 2, 1);
 
-    platforms = [Plataform2, Plataform1];
+    const wood3 = wood.clone();
+    wood3.scale.set(.015, .010, .3);
+    Plataform3 = new platform(scene, wood3, geometry, 0, -10, 4);
+
+    // ///WALLS
+    const wood4 = wood.clone();
+    wood4.scale.set(.015, .5, .013);
+    wall1 = new wall(scene, wood4, geometry, 0, 10, -6);
+
+    platforms = [Plataform2, Plataform1, Plataform3];
+    walls = [wall1];
     PlatfomsScena = true;
 }, undefined, (error) => {
     console.error('Error al cargar el modelo FBX:', error);
@@ -86,11 +99,15 @@ loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
     MonkeyFBX.scale.set(.0015, .0015, .0015);
     // Crear el objeto Mixer para reproducir las animaciones del modelo
     mixer2 = new THREE.AnimationMixer(MonkeyFBX);
-    var run = mixer2.clipAction(MonkeyFBX.animations[0]);
-    var idle = mixer2.clipAction(MonkeyFBX.animations[1]);
+    var run = mixer2.clipAction(MonkeyFBX.animations[1]);
+    var idle = mixer2.clipAction(MonkeyFBX.animations[0]);
+    var jump = mixer2.clipAction(MonkeyFBX.animations[2]);
+    var climb = mixer2.clipAction(MonkeyFBX.animations[3]);
 
     animations.push(run);
     animations.push(idle);
+    animations.push(jump);
+    animations.push(climb);
 
     // Obtener la animación del modelo y crear una instancia de la animación
     MonkeyFBX.traverse(child => {
@@ -123,11 +140,15 @@ loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
     MonkeyFBX.scale.set(.0015, .0015, .0015);
     // Crear el objeto Mixer para reproducir las animaciones del modelo
     mixer = new THREE.AnimationMixer(MonkeyFBX);
-    var run = mixer.clipAction(MonkeyFBX.animations[0]);
-    var idle = mixer.clipAction(MonkeyFBX.animations[1]);
+    var run = mixer.clipAction(MonkeyFBX.animations[1]);
+    var idle = mixer.clipAction(MonkeyFBX.animations[0]);
+    var jump = mixer.clipAction(MonkeyFBX.animations[2]);
+    var climb = mixer.clipAction(MonkeyFBX.animations[3]);
 
     animations.push(run);
     animations.push(idle);
+    animations.push(jump);
+    animations.push(climb);
 
     // Obtener la animación del modelo y crear una instancia de la animación
     MonkeyFBX.traverse(child => {
@@ -160,13 +181,13 @@ loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
 // //// PLATAFORMAS
 
 
-/* // //Importar
+// //Importar
 var textureLoader = new THREE.TextureLoader();
 
 // Carga la imagen del fondo
 textureLoader.load('./assets/img/chango.png', function (texture) { // Configura la propiedad background de la escena con la textura cargada
     scene.background = texture;
-}); */
+});
 
 animate();
 
@@ -212,12 +233,19 @@ function init() {
 
 
     // camera
-    camera = new THREE.PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.5, 14);
-    camera.position.set(10, 2, 0);
+
+    camera = new THREE.PerspectiveCamera(90, window.innerWidth / 2 / window.innerHeight, 0.1, 1000);
+    camera2 = new THREE.PerspectiveCamera(90, window.innerWidth / 2 / window.innerHeight, 0.1, 1000);
+
+    camera.position.set(10, 0, 0);
+    camera.lookAt(0, 0, 0);
+    camera2.position.set(10, 0, 0);
+    camera2.lookAt(0, 0, 0);
     camera.quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2);
+    camera2.quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2);
 
     scene.add(camera);
-
+    scene.add(camera2);
     // lights
     var light,
         materials;
@@ -244,26 +272,41 @@ function init() {
     light.shadow.darkness = 0.5;
 
     scene.add(light);
-    renderer = new THREE.WebGLRenderer({antialias: true});
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(scene.fog.color);
-    container.appendChild(renderer.domElement);
-    window.addEventListener('resize', onWindowResize, false);
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth / 2.03, window.innerHeight);
+    renderer.setViewport(0, 0, window.innerWidth / 2.03, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    renderer2 = new THREE.WebGLRenderer();
+    renderer2.setSize(window.innerWidth / 2.03, window.innerHeight);
+    renderer2.setViewport(0, 0, window.innerWidth / 2.03, window.innerHeight);
+    document.body.appendChild(renderer2.domElement);
 
 
 }
-
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    // controls.handleResize();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    var aspect = window.innerWidth / window.innerHeight;
+    var halfWidth = aspect / 2;
+
+    camera.aspect = halfWidth;
+    camera.updateProjectionMatrix();
+
+    camera2.aspect = halfWidth;
+    camera2.updateProjectionMatrix();
+
+    renderer.setSize(window.innerWidth / 2.03, window.innerHeight);
+    renderer.setViewport(0, 0, window.innerWidth / 2.03, window.innerHeight);
+
+    renderer2.setSize(window.innerWidth / 2.03, window.innerHeight);
+    renderer2.setViewport(0, 0, window.innerWidth / 2.03, window.innerHeight);
 }
 
+window.addEventListener('resize', onWindowResize, false);
 
-function updatePhysics(platforms) {
+function updatePhysics(platforms, walls) {
     if (PlatfomsScena) {
-        player1.gravity(platforms, gravity);
-        player2.gravity(platforms, gravity);
+        player1.gravity(platforms, walls, gravity);
+        player2.gravity(platforms, walls, gravity);
     }
 
 
@@ -277,12 +320,18 @@ function animate() {
 
     TWEEN.update(); // Log de la posición actual del objeto
     if (cargadoModel) {
-        updatePhysics(platforms);
+        updatePhysics(platforms, walls);
         mixer.update(0.016);
         mixer2.update(0.016);
+        camera.position.copy(player1.getPosition());
+        camera.position.add(new THREE.Vector3(10, 2, 0));
+        camera.lookAt(player1.getPosition());
 
+        camera2.position.copy(player2.getPosition());
+        camera2.position.add(new THREE.Vector3(10, 2, 0));
+        camera2.lookAt(player2.getPosition());
 
-        if (player1.getPositionY() >= player2.getPositionY()) {
+        /* if (player1.getPositionY() >= player2.getPositionY()) {
             camera.position.copy(player1.getPosition());
             camera.position.add(new THREE.Vector3(10, 2, 0));
             camera.lookAt(player1.getPosition());
@@ -290,11 +339,12 @@ function animate() {
             camera.position.copy(player2.getPosition());
             camera.position.add(new THREE.Vector3(10, 2, 0));
             camera.lookAt(player2.getPosition());
-        } player1.input(Key.SPACE, Key.A, Key.D);
+        }   */
+        player1.input(Key.SPACE, Key.A, Key.D);
         player2.input(Key.UP, Key.LEFT, Key.RIGHT);
     }
     // Renderizado de la escena
-    renderer.render(scene, camera);
+
 
     // Llamada a la función para el siguiente frame de animación
     requestAnimationFrame(animate);
@@ -305,4 +355,6 @@ function animate() {
 function render() { // Actualizar la posición del objeto del HUD para que siga a la cámara
 
     renderer.render(scene, camera);
+    renderer2.render(scene, camera2);
+
 }

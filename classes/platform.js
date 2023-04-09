@@ -7,7 +7,6 @@ export class platform {
         this.mesh = fbxMesh;
         this.mesh.position.set(x, y, z);
         this.mesh.geometry = geometry;
-
         this.scene.add(this.mesh);
     }
 
