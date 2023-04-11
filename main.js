@@ -4,6 +4,7 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.mod
 import {platform} from './classes/platform.js';
 import {players} from './classes/players.js';
 import {wall} from './classes/wall.js';
+import {fruit} from './classes/fruit.js';
 import {FBXLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/FBXLoader.js';
 import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js';
 import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
@@ -30,67 +31,85 @@ var player1,
 
 
 var loader = new FBXLoader();
-var animLoader = new FBXLoader();
+
 
 var MonkeyFBX;
 
-var cargadoModel = false,
-    cargadoAnim = false;
+var cargadoModel = false;
 
 
 var mixer;
-var mixer2
-var mixer3;
+var mixer2;
 
-var Plataform1,
-    Plataform2,
-    Plataform3,
-    wall1;
+var PlataformMap,
+    wallMap,
+    PowerMap;
 
 var PlatfomsScena = false;
 var platforms = [],
-    walls = [];
+    walls = [],
+    powers = [];
 
-loader.load('./assets/models/Platforms/Wood.fbx', (fbx) => {
-    var wood = fbx;
-    wood.scale.set(.015, .010, .015);
-    wood.traverse(child => {
-        if (child.isMesh) {
-            child.AmbientLighty = -10;
-            child.material.transparent = false; // Hacer el material transparente
-            child.material.side = THREE.DoubleSide; // Configurar la visualización de las caras del material
-            child.material.metalness = 0.8; // Configurar la reflectividad del material
-            child.material.roughness = 0.2; // Configurar la suavidad del material
-            child.material.envMapIntensity = 1; // Configurar la intensidad del mapa de entorno del material
-            child.material.needsUpdate = true; // Asegurarse de que el material se actualice correctamente
+// MODELS PATH
+const ModelWood = './assets/models/Platforms/Wood.fbx';
+const ModelMetal = './assets/models/Platforms/Metal.fbx';
+const ModelCoco = './assets/models/Props/fruits/Coco/Coco.fbx';
+const ModelBanana = './assets/models/Props/fruits/Banana/Banana.fbx';
+const ModelMango = './assets/models/Props/fruits/Mango/Mango.fbx';
+
+function CargadoModelo(path, type, Sx, Sy, Sz, Px, Py, Pz) {
+    loader.load(path, (fbx) => {
+        var wood = fbx;
+
+        wood.traverse(child => {
+            if (child.isMesh) {
+                child.AmbientLighty = -10;
+                child.material.transparent = false; // Hacer el material transparente
+                child.material.side = THREE.DoubleSide; // Configurar la visualización de las caras del material
+                child.material.metalness = 0.8; // Configurar la reflectividad del material
+                child.material.roughness = 0.2; // Configurar la suavidad del material
+                child.material.envMapIntensity = 1; // Configurar la intensidad del mapa de entorno del material
+                child.material.needsUpdate = true; // Asegurarse de que el material se actualice correctamente
+
+            }
+        });
+        const geometry = wood.children[0].geometry;
+
+        if (type == "P") { // PLATAFORMAS
+            wood.scale.set(Sx, Sy, Sz);
+            PlataformMap = new platform(scene, wood, geometry, Px, Py, Pz);
+            platforms.push(PlataformMap);
+
+        } else if (type == "W") { // ///WALLS
+            const wood4 = wood.clone();
+            wood4.scale.set(Sx, Sy, Sz);
+            wallMap = new wall(scene, wood4, geometry, Px, Px, Pz);
+            walls.push(wallMap);
+
+        } else if (type == "B") { // ///Banana
+            const wood4 = wood.clone();
+            wood4.scale.set(Sx, Sy, Sz);
+            PowerMap = new fruit(scene, wood4, geometry, Px, Py, Pz);
+            powers.push(PowerMap);
 
         }
+
+
+        PlatfomsScena = true;
+    }, undefined, (error) => {
+        console.error('Error al cargar el modelo FBX:', error);
     });
-    const geometry = wood.children[0].geometry;
 
-    // PLATAFORMAS
-    wood.scale.set(.015, .010, .03);
-    Plataform2 = new platform(scene, wood, geometry, 0, 0, 0);
-
-    const wood2 = wood.clone();
-    wood2.scale.set(.015, .010, .013);
-    Plataform1 = new platform(scene, wood2, geometry, 0, 5, 4);
-
-    const wood3 = wood.clone();
-    wood3.scale.set(.015, .010, .3);
-    Plataform3 = new platform(scene, wood3, geometry, 0, -10, 4);
-
-    // ///WALLS
-    const wood4 = wood.clone();
-    wood4.scale.set(.015, .5, .013);
-    wall1 = new wall(scene, wood4, geometry, 0, 10, -6);
-
-    platforms = [Plataform2, Plataform1, Plataform3];
-    walls = [wall1];
-    PlatfomsScena = true;
-}, undefined, (error) => {
-    console.error('Error al cargar el modelo FBX:', error);
-});
+}
+// FRUITS
+CargadoModelo(ModelMango, "B", .0010, .0010, .0010, 0, 10, -5);
+CargadoModelo(ModelCoco, "B", .010, .010, .010, 0, 10, 5);
+CargadoModelo(ModelBanana, "B", .010, .010, .010, 0, 10, 0);
+// /PLATFORMS
+CargadoModelo(ModelWood, "P", .015, .010, .08, 0, 6, 0);
+CargadoModelo(ModelMetal, "P", .015, .010, .03, 0, 0, 0);
+// WALLS
+CargadoModelo(ModelWood, "W", .015, .21, .003, 0, 0, -15);
 
 
 loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
@@ -307,6 +326,7 @@ function updatePhysics(platforms, walls) {
     if (PlatfomsScena) {
         player1.gravity(platforms, walls, gravity);
         player2.gravity(platforms, walls, gravity);
+
     }
 
 
@@ -330,6 +350,12 @@ function animate() {
         camera2.position.copy(player2.getPosition());
         camera2.position.add(new THREE.Vector3(10, 2, 0));
         camera2.lookAt(player2.getPosition());
+
+
+        for (let i = 0; i < powers.length; i++) {
+            powers[i].update();
+        }
+
 
         /* if (player1.getPositionY() >= player2.getPositionY()) {
             camera.position.copy(player1.getPosition());
