@@ -6,49 +6,43 @@ import {players} from './classes/players.js';
 import {wall} from './classes/wall.js';
 import {fruit} from './classes/fruit.js';
 import {FBXLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/FBXLoader.js';
-import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js';
+/* import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js';
 import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
+ */
 
-
+// VENTANA
 var container,
     camera,
     camera2,
     scene,
     renderer,
     renderer2;
-
 if (!Detector.webgl) 
     Detector.addGetWebGLMessage();
 
-
-
 // GRAVEDAD
 var gravity = new THREE.Vector3(0, -0.01, 0);
-
-
+// JUGADORES
 var player1,
     player2;
-
-
+// CARGADO DE MODELOS
 var loader = new FBXLoader();
-
-
+// MODELOS
 var MonkeyFBX;
-
 var cargadoModel = false;
-
-
+// MIX ANIMACIONES
 var mixer;
 var mixer2;
-
+// MODELBUFFER
 var PlataformMap,
     wallMap,
     PowerMap;
-
-var PlatfomsScena = false;
+// ARREGLOS DE OBJETOS
 var platforms = [],
     walls = [],
     powers = [];
+// CARGADO DE MODELOS
+var PlatfomsScena = false;
 
 // MODELS PATH
 const ModelWood = './assets/models/Platforms/Wood.fbx';
@@ -57,50 +51,8 @@ const ModelCoco = './assets/models/Props/fruits/Coco/Coco.fbx';
 const ModelBanana = './assets/models/Props/fruits/Banana/Banana.fbx';
 const ModelMango = './assets/models/Props/fruits/Mango/Mango.fbx';
 
-function CargadoModelo(path, type, Sx, Sy, Sz, Px, Py, Pz) {
-    loader.load(path, (fbx) => {
-        var wood = fbx;
-
-        wood.traverse(child => {
-            if (child.isMesh) {
-                child.AmbientLighty = -10;
-                child.material.transparent = false; // Hacer el material transparente
-                child.material.side = THREE.DoubleSide; // Configurar la visualización de las caras del material
-                child.material.metalness = 0.8; // Configurar la reflectividad del material
-                child.material.roughness = 0.2; // Configurar la suavidad del material
-                child.material.envMapIntensity = 1; // Configurar la intensidad del mapa de entorno del material
-                child.material.needsUpdate = true; // Asegurarse de que el material se actualice correctamente
-
-            }
-        });
-        const geometry = wood.children[0].geometry;
-
-        if (type == "P") { // PLATAFORMAS
-            wood.scale.set(Sx, Sy, Sz);
-            PlataformMap = new platform(scene, wood, geometry, Px, Py, Pz);
-            platforms.push(PlataformMap);
-
-        } else if (type == "W") { // ///WALLS
-            const wood4 = wood.clone();
-            wood4.scale.set(Sx, Sy, Sz);
-            wallMap = new wall(scene, wood4, geometry, Px, Px, Pz);
-            walls.push(wallMap);
-
-        } else if (type == "B") { // ///Banana
-            const wood4 = wood.clone();
-            wood4.scale.set(Sx, Sy, Sz);
-            PowerMap = new fruit(scene, wood4, geometry, Px, Py, Pz);
-            powers.push(PowerMap);
-
-        }
-
-
-        PlatfomsScena = true;
-    }, undefined, (error) => {
-        console.error('Error al cargar el modelo FBX:', error);
-    });
-
-}
+// B=FRUITS, P=PLATFORMS W=WALL
+// CARGARMODELO(modelo,"tipoObjeto,escalaX,escalaY,escala,Z,posicionX,posicionY,posicionZ")
 // FRUITS
 CargadoModelo(ModelMango, "B", .0010, .0010, .0010, 0, 10, -5);
 CargadoModelo(ModelCoco, "B", .010, .010, .010, 0, 10, 5);
@@ -110,7 +62,6 @@ CargadoModelo(ModelWood, "P", .015, .010, .08, 0, 6, 0);
 CargadoModelo(ModelMetal, "P", .015, .010, .03, 0, 0, 0);
 // WALLS
 CargadoModelo(ModelWood, "W", .015, .21, .003, 0, 0, -15);
-
 
 loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
     var animations = [];
@@ -183,7 +134,6 @@ loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
         }
     });
 
-
     player1 = new players(0, 5, 0, MonkeyFBX, animations)
     scene.add(player1.getMesh());
     cargadoModel = true;
@@ -193,13 +143,6 @@ loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
     console.error('Error al cargar el modelo FBX:', error);
 });
 
-
-// /// JUGADORES
-
-
-// //// PLATAFORMAS
-
-
 // //Importar
 var textureLoader = new THREE.TextureLoader();
 
@@ -208,39 +151,49 @@ textureLoader.load('./assets/img/chango.png', function (texture) { // Configura 
     scene.background = texture;
 });
 
-animate();
 
-// Agregar una variable de estado para rastrear si el objeto está actualmente en una animación
-function applyImpactDistortion(cube, duration, distortionAmountX, distortionAmountY, distortionAmountZ) { // Guardar la escala original del cubo
-    var originalScale = {
-        x: cube.scale.x,
-        y: cube.scale.y,
-        z: cube.scale.z
-    };
+function CargadoModelo(path, type, Sx, Sy, Sz, Px, Py, Pz) {
+    loader.load(path, (fbx) => {
+        var model = fbx;
 
-    var targetScale = {
-        x: distortionAmountX,
-        y: distortionAmountY,
-        z: distortionAmountZ
-    };
+        model.traverse(child => {
+            if (child.isMesh) {
+                child.AmbientLighty = -10;
+                child.material.transparent = false; // Hacer el material transparente
+                child.material.side = THREE.DoubleSide; // Configurar la visualización de las caras del material
+                child.material.metalness = 0.8; // Configurar la reflectividad del material
+                child.material.roughness = 0.2; // Configurar la suavidad del material
+                child.material.envMapIntensity = 1; // Configurar la intensidad del mapa de entorno del material
+                child.material.needsUpdate = true; // Asegurarse de que el material se actualice correctamente
 
-    // Crear la animación de distorsión
-    const tween = new TWEEN.Tween(targetScale).to(targetScale, duration).easing(TWEEN.Easing.Quadratic.Out).onUpdate(() => { // Actualizar la escala del cubo en cada frame de la animación
-        cube.scale.set(targetScale.x, targetScale.y, targetScale.z);
-    }).start();
+            }
+        });
+        const geometry = model.children[0].geometry;
+        model.scale.set(Sx, Sy, Sz);
+        if (type == "P") { // PLATAFORMAS
+            PlataformMap = new platform(scene, model, geometry, Px, Py, Pz);
+            platforms.push(PlataformMap);
 
-    // Crear la animación de regreso a la escala original
-    const tweenBack = new TWEEN.Tween(originalScale).to(originalScale, duration).easing((t) => Math.sin(t * Math.PI / 2)).onUpdate(() => { // Actualizar la escala del cubo en cada frame de la animación
-        cube.scale.set(originalScale.x, originalScale.y, originalScale.z);
+        } else if (type == "W") { // ///WALLS
+            wallMap = new wall(scene, model, geometry, Px, Px, Pz);
+            walls.push(wallMap);
+
+        } else if (type == "B") { // ///Banana
+            PowerMap = new fruit(scene, model, geometry, Px, Py, Pz);
+            powers.push(PowerMap);
+
+        }
+
+
+        PlatfomsScena = true;
+    }, undefined, (error) => {
+        console.error('Error al cargar el modelo FBX:', error);
     });
 
-    // Encadenar las animaciones de distorsión y regreso
-    tween.chain(tweenBack);
-
-    // Retornar las animaciones para poder detenerlas si es necesario
-
-    return {tween, tweenBack};
 }
+
+animate();
+
 
 function init() {
     container = document.createElement('div');
@@ -266,8 +219,7 @@ function init() {
     scene.add(camera);
     scene.add(camera2);
     // lights
-    var light,
-        materials;
+    var light;
     scene.add(new THREE.AmbientLight(0x666666));
 
     light = new THREE.DirectionalLight(0xffffff, 1);
@@ -343,6 +295,7 @@ function animate() {
         updatePhysics(platforms, walls);
         mixer.update(0.016);
         mixer2.update(0.016);
+
         camera.position.copy(player1.getPosition());
         camera.position.add(new THREE.Vector3(10, 2, 0));
         camera.lookAt(player1.getPosition());
@@ -351,26 +304,13 @@ function animate() {
         camera2.position.add(new THREE.Vector3(10, 2, 0));
         camera2.lookAt(player2.getPosition());
 
-
         for (let i = 0; i < powers.length; i++) {
             powers[i].update();
         }
 
-
-        /* if (player1.getPositionY() >= player2.getPositionY()) {
-            camera.position.copy(player1.getPosition());
-            camera.position.add(new THREE.Vector3(10, 2, 0));
-            camera.lookAt(player1.getPosition());
-        } else {
-            camera.position.copy(player2.getPosition());
-            camera.position.add(new THREE.Vector3(10, 2, 0));
-            camera.lookAt(player2.getPosition());
-        }   */
         player1.input(Key.SPACE, Key.A, Key.D);
         player2.input(Key.UP, Key.LEFT, Key.RIGHT);
     }
-    // Renderizado de la escena
-
 
     // Llamada a la función para el siguiente frame de animación
     requestAnimationFrame(animate);

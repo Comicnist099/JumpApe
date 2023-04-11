@@ -9,18 +9,4 @@ export class platform {
         this.mesh.geometry = geometry;
         this.scene.add(this.mesh);
     }
-
-
-    setScale(x, y, z) {
-        this.mesh.scale.set(x, y, z);
-    }
-
-    setGeometry(width, height, depth) {
-        this.geometry = new THREE.BoxGeometry(width, height, depth);
-        this.mesh.geometry = this.geometry;
-    }
-
-    setPosition(x, y, z) {
-        this.mesh.position.set(x, y, z);
-    }
 }
