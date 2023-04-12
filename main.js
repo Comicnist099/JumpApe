@@ -20,6 +20,8 @@ var container,
 if (!Detector.webgl) 
     Detector.addGetWebGLMessage();
 
+
+
 // GRAVEDAD
 var gravity = new THREE.Vector3(0, -0.01, 0);
 // JUGADORES
@@ -51,17 +53,20 @@ const ModelCoco = './assets/models/Props/fruits/Coco/Coco.fbx';
 const ModelBanana = './assets/models/Props/fruits/Banana/Banana.fbx';
 const ModelMango = './assets/models/Props/fruits/Mango/Mango.fbx';
 
+
 // B=FRUITS, P=PLATFORMS W=WALL
 // CARGARMODELO(modelo,"tipoObjeto,escalaX,escalaY,escala,Z,posicionX,posicionY,posicionZ")
 // FRUITS
-CargadoModelo(ModelMango, "B", .0010, .0010, .0010, 0, 10, -5);
+CargadoModelo(ModelMango, "B", .0010, .0010, .0010, 0, 30, 5);
 CargadoModelo(ModelCoco, "B", .010, .010, .010, 0, 10, 5);
 CargadoModelo(ModelBanana, "B", .010, .010, .010, 0, 10, 0);
 // /PLATFORMS
 CargadoModelo(ModelWood, "P", .015, .010, .08, 0, 6, 0);
 CargadoModelo(ModelMetal, "P", .015, .010, .03, 0, 0, 0);
+CargadoModelo(ModelMetal, "P", .015, .010, .015, 0, 26.5, -5);
 // WALLS
-CargadoModelo(ModelWood, "W", .015, .21, .003, 0, 0, -15);
+CargadoModelo(ModelWood, "W", .015, .21, .009, 0, 25, 10);
+CargadoModelo(ModelWood, "W", .015, .21, .009, 0, 15, -5);
 
 loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
     var animations = [];
@@ -94,7 +99,7 @@ loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
     });
 
 
-    player2 = new players(0, 5, 0, MonkeyFBX, animations)
+    player2 = new players(0, 5, 0, scene, MonkeyFBX, animations)
     scene.add(player2.getMesh());
     cargadoModel = true;
 
@@ -134,7 +139,7 @@ loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
         }
     });
 
-    player1 = new players(0, 5, 0, MonkeyFBX, animations)
+    player1 = new players(0, 5, 0, scene, MonkeyFBX, animations)
     scene.add(player1.getMesh());
     cargadoModel = true;
 
@@ -175,7 +180,7 @@ function CargadoModelo(path, type, Sx, Sy, Sz, Px, Py, Pz) {
             platforms.push(PlataformMap);
 
         } else if (type == "W") { // ///WALLS
-            wallMap = new wall(scene, model, geometry, Px, Px, Pz);
+            wallMap = new wall(scene, model, geometry, Px, Py, Pz);
             walls.push(wallMap);
 
         } else if (type == "B") { // ///Banana
@@ -274,10 +279,10 @@ function onWindowResize() {
 
 window.addEventListener('resize', onWindowResize, false);
 
-function updatePhysics(platforms, walls) {
+function updatePhysics(platforms, walls, powers) {
     if (PlatfomsScena) {
-        player1.gravity(platforms, walls, gravity);
-        player2.gravity(platforms, walls, gravity);
+        player1.gravity(platforms, walls, powers, gravity);
+        player2.gravity(platforms, walls, powers, gravity);
 
     }
 
@@ -292,7 +297,7 @@ function animate() {
 
     TWEEN.update(); // Log de la posición actual del objeto
     if (cargadoModel) {
-        updatePhysics(platforms, walls);
+        updatePhysics(platforms, walls, powers);
         mixer.update(0.016);
         mixer2.update(0.016);
 

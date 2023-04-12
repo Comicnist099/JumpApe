@@ -2,7 +2,7 @@ import {platform} from './platform.js';
 export class fruit extends platform {
     constructor(scene, fbxMesh, geometry, x, y, z) {
         super(scene, fbxMesh, geometry, x, y, z);
-
+        this.puntos = 100;
     }
 
     update() {
