@@ -40,21 +40,77 @@ var PlataformMap,
     wallMap,
     PowerMap;
 // ARREGLOS DE OBJETOS
+var posicion = new THREE.Vector3(0, -10, + 20);
 var platforms = [],
     walls = [],
-    powers = [];
+    powers = [],
+    colisionLimit = [],
+
+    mapTile = [
+        "PPWxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxxBxWxxxxxxxxxxxxxxxxxxxxxxx",
+        "Wxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxWxxWxxxxxxxxxxxxxxxxxxxxxxx",
+        "WPxPPxxxxxxxxxxxxxxxxxxxxxxxx",
+        "xPWPPWxxxxxxxxxxxxxxxxxxxxxxx",
+        "PPPPxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "PPPPxWxxxxxxxxxxxxxxxxxxxxxxx",
+        "PPxPPxxxxxxxxxxxxxxxxxxxxxxxx",
+        "PPxPPWxxxxxxxxxxxxxxxxxxxxxxx",
+        "PPxxPxxxxxxxxxxxxxxxxxxxxxxxx",
+        "PPPxPWxxxxxxxxxxxxxxxxxxxxxxx",
+        "PPPWPxxxxxxxxxxxxxxxxxxxxxxxx",
+        "PxxxPWxxxxxxxxxxxxxxxxxxxxxxx",
+        "PWPxPxxxxxxxxxxxxxxxxxxxxxxxx",
+        "PPxPPWxxxxxxxxxxxxxxxxxxxxxxx",
+        "PPxxPxxxxxxxxxxxxxxxxxxxxxxxx",
+        "PPPPxWxxxxxxxxxxxxxxxxxxxxxxx"
+
+    ];
+
+
 // CARGADO DE MODELOS
 var PlatfomsScena = false;
 
 // MODELS PATH
+const ModelBlock = './assets/models/Platforms/Block.fbx';
 const ModelWood = './assets/models/Platforms/Wood.fbx';
 const ModelMetal = './assets/models/Platforms/Metal.fbx';
+
+const ModelSpike = './assets/models/Platforms/Spikes.fbx';
 const ModelCoco = './assets/models/Props/fruits/Coco/Coco.fbx';
 const ModelBanana = './assets/models/Props/fruits/Banana/Banana.fbx';
 const ModelMango = './assets/models/Props/fruits/Mango/Mango.fbx';
+const ModelCloud = './assets/models/Platforms/Cloud.fbx';
 
+var consolehtml = document.getElementById("console");
 
-// B=FRUITS, P=PLATFORMS W=WALL
+for (let i = 0; i < mapTile.length; i++) {
+    posicion.y = posicion.y + 10;
+    let posZ = posicion.z;
+    for (let y = 0; y < mapTile[i].length; y++) {
+        switch (mapTile[i][y]) {
+            case "x":
+                console.log("x");
+                break;
+            case "P": CargadoModelo(ModelBlock, "P", .015, .02, .04, 0, posicion.y - 1.48, posicion.z);
+                console.log("P");
+                break;
+            case "W": CargadoModelo(ModelWood, "W", .015, .14, .04, 0, posicion.y + 2, posicion.z);
+
+                console.log("W");
+                break;
+            case "B": CargadoModelo(ModelCoco, "B", .010, .010, .010, 0, posicion.y, posicion.z);
+                break;
+            default:
+                break;
+        }
+        posicion.z = posicion.z - 10;
+    }
+    posicion.z = posZ;
+}
+
+/* // B=FRUITS, P=PLATFORMS W=WALL
 // CARGARMODELO(modelo,"tipoObjeto,escalaX,escalaY,escala,Z,posicionX,posicionY,posicionZ")
 // FRUITS
 CargadoModelo(ModelMango, "B", .0010, .0010, .0010, 0, 30, 5);
@@ -67,6 +123,7 @@ CargadoModelo(ModelMetal, "P", .015, .010, .015, 0, 26.5, -5);
 // WALLS
 CargadoModelo(ModelWood, "W", .015, .21, .009, 0, 25, 10);
 CargadoModelo(ModelWood, "W", .015, .21, .009, 0, 15, -5);
+ */
 
 loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
     var animations = [];
@@ -170,7 +227,6 @@ function CargadoModelo(path, type, Sx, Sy, Sz, Px, Py, Pz) {
                 child.material.roughness = 0.2; // Configurar la suavidad del material
                 child.material.envMapIntensity = 1; // Configurar la intensidad del mapa de entorno del material
                 child.material.needsUpdate = true; // Asegurarse de que el material se actualice correctamente
-
             }
         });
         const geometry = model.children[0].geometry;
@@ -211,8 +267,8 @@ function init() {
 
     // camera
 
-    camera = new THREE.PerspectiveCamera(90, window.innerWidth / 2 / window.innerHeight, 0.1, 1000);
-    camera2 = new THREE.PerspectiveCamera(90, window.innerWidth / 2 / window.innerHeight, 0.1, 1000);
+    camera = new THREE.PerspectiveCamera(120, window.innerWidth / 2 / window.innerHeight, 0.1, 1000);
+    camera2 = new THREE.PerspectiveCamera(120, window.innerWidth / 2 / window.innerHeight, 0.1, 1000);
 
     camera.position.set(10, 0, 0);
     camera.lookAt(0, 0, 0);
@@ -315,6 +371,11 @@ function animate() {
 
         player1.input(Key.SPACE, Key.A, Key.D);
         player2.input(Key.UP, Key.LEFT, Key.RIGHT);
+
+
+        consolehtml.innerHTML = "Posición del personaje:" + "<br>X:" + player1.getPositionX() + "  Y:" + player1.getPositionY() + "  Z:" + player1.getPositionZ() + "<br>Piso:" + player1.touchFloor;
+
+
     }
 
     // Llamada a la función para el siguiente frame de animación
