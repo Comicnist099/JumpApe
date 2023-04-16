@@ -15,7 +15,7 @@ export class players {
         this.PressJump = false;
         this.veces = 0;
         this.velocity = new THREE.Vector3(0, 0, 0);
-        this.maxVelocity = .8;
+        this.maxVelocity = .75;
         this.rotation = -0.5;
         this.right = false;
         this.left = false;
@@ -30,17 +30,10 @@ export class players {
 
         this.animations = []
         this.animations = animations;
-
-
-        // Agregar el objeto a la escena
-
-
-        // Agregar el objeto a la escena
     }
     setMesh(mesh) {
         this.mesh = mesh;
     }
-
     getPosition() {
         return this.mesh.position;
     }
@@ -53,20 +46,15 @@ export class players {
     getPositionZ() {
         return this.mesh.position.z.toFixed(3);
     }
-
-
     getSize() {
         return this.geometry.parameters.width;
     }
-
     getColor() {
         return this.material.color;
     }
-
     setColor(color) {
         this.material.color.set(color);
     }
-
     getMesh() {
         return this.mesh;
     }
@@ -144,11 +132,13 @@ export class players {
 
 
             } else if (!this.PressJump && this.touchFloor) {
+
                 this.animations[1].stop();
                 this.animations[2].stop();
 
                 this.animations[0].play();
             } else {
+
                 this.animations[1].stop();
                 this.animations[3].stop();
                 this.animations[0].stop();
@@ -160,6 +150,7 @@ export class players {
 
         } else if (Key.isDown(RIGHT)) {
             this.right = true;
+
             if (this.touchWall) {
                 this.animations[0].stop();
                 this.animations[1].stop();
@@ -201,6 +192,7 @@ export class players {
 
 
             } else {
+
                 if (this.PressJump) {
                     if (!this.touchFloor) {
 
@@ -210,6 +202,8 @@ export class players {
                         this.animations[2].play();
                     }
                 } else {
+                    this.yAcceleration = 0.02;
+
                     if (this.touchFloor) {
                         this.animations[2].stop();
                         this.animations[0].stop();
@@ -236,6 +230,33 @@ export class players {
 
     }
 
+
+    gravity(platforms, walls, wallsSide, wallsUp, wallsDown, powers, gravity) {
+
+
+        this.velocity.add(gravity);
+
+        // Limitar la velocidad máxima del objeto
+        if (this.velocity.length() > this.maxVelocity) {
+            this.velocity.normalize().multiplyScalar(this.maxVelocity);
+        }
+        console.log(this.velocity.length());
+        this.mesh.position.add(this.velocity);
+
+
+        var Jy1 = this.mesh.position.y
+        var Jy2 = this.mesh.scale.y + this.mesh.position.y;
+        var Jz1 = this.mesh.position.z
+        var Jz2 = this.mesh.scale.z + this.mesh.position.z;
+        console.log("PUNTOS JUGADOR " + this.puntos);
+        // Colisiones a los arrays
+        this.colision(wallsUp, Jy1, Jy2, Jz1, Jz2, 5);
+        this.colision(wallsDown, Jy1, Jy2, Jz1, Jz2, 6);
+        this.colision(walls, Jy1, Jy2, Jz1, Jz2, 1);
+        this.colision(wallsSide, Jy1, Jy2, Jz1, Jz2, 4);
+        this.colision(platforms, Jy1, Jy2, Jz1, Jz2, 2);
+        this.colision(powers, Jy1, Jy2, Jz1, Jz2, 3);
+    }
     /*Mode 1=Colisiones totales
       Mode 2=Colisiones plataformas huecas
       Mode 3=PowerUps*/
@@ -252,22 +273,12 @@ export class players {
             var Py2 = elemento.mesh.position.y - height / 2;
             var Pz1 = elemento.mesh.position.z - width / 2;
             var Pz2 = elemento.mesh.position.z + width / 2;
-
-            if (mode == 1) { // Hitbox de la plataforma;
+            if (mode == 4) { // Hitbox de la plataforma;
 
                 if (Jy2 < Py1 + 1 && Jy1 > Py2 - .8 && Jz2 > Pz1 - .79 && Jz1 < Pz2 + .8) {
-                    if (this.mesh.position.y > Py1) {
-
-                        console.log("Plataforma");
-                        this.touchFloor = true;
-                        this.touchFloorWall = true;
-                        this.ySpeed = 0;
-                        this.velocity.y = 0;
-                        this.mesh.position.setY(Py1 + 1); // Ajustar la posición del objeto
-                        break; // Salir del bucle si hay una colisión
-                    } else if (this.mesh.position.y<Py2) {
-                        this.mesh.position.setY(Py2 -.8);
-                    } else if (this.mesh.position.z>Pz1) {
+                    if (this.mesh.position.y > Py1) {} else if (this.mesh.position.y<Py2) {
+                    
+                } else if (this.mesh.position.z>Pz1) {
                         console.log("tocado Wall");
                         this.touchWall = true;
                         this.ySpeed = 0;
@@ -275,6 +286,99 @@ export class players {
                         this.mesh.position.setZ(Pz2 + .8); // Ajustar la posición del objeto
                         break; // Salir del bucle si hay una colisión                }
                     } else if (this.mesh.position.z<Pz2) {
+                console.log("tocado Wall");
+                this.touchWall = true;
+                this.ySpeed = 0;
+                this.velocity.y = 0;
+                this.mesh.position.setZ(Pz1-.8); // Ajustar la posición del objeto
+                break; // Salir del bucle si hay una colisión                }
+            }
+            }}else if (mode == 1) { // Hitbox de la plataforma;
+
+                if (Jy2 < Py1 + 1 && Jy1 > Py2 - .8 && Jz2>Pz1 - .79 && Jz1 < Pz2 + .8) {
+                        if (this.mesh.position.y > Py1) {
+
+                            console.log("Plataforma");
+                            this.touchFloor = true;
+                            this.touchFloorWall = true;
+                            this.ySpeed = 0;
+                            this.velocity.y = 0;
+                            this.mesh.position.setY(Py1 + 1); // Ajustar la posición del objeto
+                            break; // Salir del bucle si hay una colisión
+                        } else if (this.mesh.position.y<Py2) {
+                        this.mesh.position.setY(Py2 -.8);
+                    } else if (this.mesh.position.z>Pz1) {
+                            console.log("tocado Wall");
+                            this.touchWall = true;
+                            this.ySpeed = 0;
+                            this.velocity.y = 0;
+                            this.mesh.position.setZ(Pz2 + .8); // Ajustar la posición del objeto
+                            break; // Salir del bucle si hay una colisión                }
+                        } else if (this.mesh.position.z<Pz2) {
+                    console.log("tocado Wall");
+                    this.touchWall = true;
+                    this.ySpeed = 0;
+                    this.velocity.y = 0;
+                    this.mesh.position.setZ(Pz1-.8); // Ajustar la posición del objeto
+                    break; // Salir del bucle si hay una colisión                }
+                }
+            }}else if (mode == 6) { // Hitbox de la plataforma;
+
+                if (Jy2 < Py1 + 1 && Jy1 > Py2 - .8 && Jz2>Pz1 - .79 && Jz1 < Pz2 + .8) {
+                            if (this.mesh.position.y<Py2) {
+                        this.mesh.position.setY(Py2 -.8);
+                    } else if (this.mesh.position.z>Pz1) {
+                                console.log("tocado Wall");
+                                this.touchWall = true;
+                                this.ySpeed = 0;
+                                this.velocity.y = 0;
+                                this.mesh.position.setZ(Pz2 + .8); // Ajustar la posición del objeto
+                                break; // Salir del bucle si hay una colisión                }
+                            } else if (this.mesh.position.z<Pz2) {
+                    console.log("tocado Wall");
+                    this.touchWall = true;
+                    this.ySpeed = 0;
+                    this.velocity.y = 0;
+                    this.mesh.position.setZ(Pz1-.8); // Ajustar la posición del objeto
+                    break; // Salir del bucle si hay una colisión                }
+                }
+            }} else if (mode == 3) {
+                if (Jy2 < Py1 && Jy1 > Py2 && Jz2>Pz1 - .79 && Jz1 < Pz2 + .8) {
+                                if (this.mesh.position.y<Py2||this.mesh.position.y>Py1 || this.mesh.position.z > Pz1 || this.mesh.position.z<Pz2) {
+            console.log("fruta");
+            const indexToRemove = Array.indexOf(element);
+            if (indexToRemove !== -1) {
+                Array.splice(indexToRemove, 1);
+            }
+
+            this.scene.remove(elemento.mesh);
+
+            this.puntos = this.puntos + elemento.puntos;
+            break; // Salir del bucle si hay una colisión                }
+        }
+    }
+            }else if (mode == 5) { // Hitbox de la plataforma;
+
+                if (Jy2 < Py1 + 1 && Jy1 > Py2 - .8 && Jz2>Pz1 - .79 && Jz1 < Pz2 + .8) {
+                                    if (this.mesh.position.y > Py1) {
+
+                                        console.log("Plataforma");
+                                        this.touchFloor = true;
+                                        this.touchFloorWall = true;
+                                        this.ySpeed = 0;
+                                        this.velocity.y = 0;
+                                        this.mesh.position.setY(Py1 + 1); // Ajustar la posición del objeto
+                                        break; // Salir del bucle si hay una colisión
+                                    } else if (this.mesh.position.y<Py2) {
+                       
+                    } else if (this.mesh.position.z>Pz1) {
+                                        console.log("tocado Wall");
+                                        this.touchWall = true;
+                                        this.ySpeed = 0;
+                                        this.velocity.y = 0;
+                                        this.mesh.position.setZ(Pz2 + .8); // Ajustar la posición del objeto
+                                        break; // Salir del bucle si hay una colisión                }
+                                    } else if (this.mesh.position.z<Pz2) {
                     console.log("tocado Wall");
                     this.touchWall = true;
                     this.ySpeed = 0;
@@ -289,62 +393,25 @@ export class players {
 
             }}else if(mode==2){
    
-            if (Jy2 < Py1+.3  && Jy1 > Py2 - .8 && Jz2>Pz1 - .79 && Jz1 < Pz2 + .8) {
-                        if (this.mesh.position.y > Py1) {
-                            console.log("tocado");
-                            this.touchFloor = true;
-                            this.ySpeed = 0;
-                            this.velocity.y = 0;
-                            this.mesh.position.setY(Py1 + .3); // Ajustar la posición del objeto
-                            break; // Salir del bucle si hay una colisión                }
-                        }
-                    } else {
-                        if (!this.touchFloorWall) 
-                            this.touchFloor = false;
-                        
+            if (Jy2 < Py1+1  && Jy1 > Py2 - .8 && Jz2>Pz1 - .79 && Jz1 < Pz2 + .8) {
+                                        if (this.mesh.position.y > Py1) {
+                                            console.log("tocado");
+                                            this.touchFloor = true;
+                                            this.ySpeed = 0;
+                                            this.velocity.y = 0;
+                                            this.mesh.position.setY(Py1 + 1); // Ajustar la posición del objeto
+                                            break; // Salir del bucle si hay una colisión                }
+                                        }
+                                    } else {
+                                        if (!this.touchFloorWall) 
+                                            this.touchFloor = false;
+                                        
 
 
-                    }
-                } else if (mode == 3) {
-                    if (Jy2 < Py1 && Jy1 > Py2 && Jz2 > Pz1 - .79 && Jz1 < Pz2 + .8) {
-                        if (this.mesh.position.y<Py2||this.mesh.position.y>Py1 || this.mesh.position.z > Pz1 || this.mesh.position.z<Pz2) {
-                            console.log("fruta");
-                            const indexToRemove = Array.indexOf(element);
-                            if (indexToRemove !== -1) {
-                                Array.splice(indexToRemove, 1);
+                                    }
+                                }
+
+
                             }
-    
-                            this.scene.remove(elemento.mesh);
-    
-                            this.puntos = this.puntos + elemento.puntos;
-                            break; // Salir del bucle si hay una colisión                }
                         }
                     }
-                }
-
-
-            }
-        }
-        gravity(platforms, walls, powers, gravity) {
-
-
-            if (!this.touchWall) {
-                this.velocity.add(gravity);
-                // Limitar la velocidad máxima del objeto
-                if (this.velocity.length()> this.maxVelocity) {
-                            this.velocity.normalize().multiplyScalar(this.maxVelocity);
-                        }
-                        this.mesh.position.add(this.velocity);
-
-                    }
-                    var Jy1 = this.mesh.position.y
-                    var Jy2 = this.mesh.scale.y + this.mesh.position.y;
-                    var Jz1 = this.mesh.position.z
-                    var Jz2 = this.mesh.scale.z + this.mesh.position.z;
-                    console.log("PUNTOS JUGADOR " + this.puntos);
-                    // Colisiones a los arrays
-                    this.colision(walls, Jy1, Jy2, Jz1, Jz2, 1);
-                    this.colision(platforms, Jy1, Jy2, Jz1, Jz2, 2);
-                    this.colision(powers, Jy1, Jy2, Jz1, Jz2, 3);
-                }
-            }

@@ -38,33 +38,37 @@ var mixer2;
 // MODELBUFFER
 var PlataformMap,
     wallMap,
+    wallSideMap,
     PowerMap;
 // ARREGLOS DE OBJETOS
 var posicion = new THREE.Vector3(0, -10, + 20);
 var platforms = [],
     walls = [],
+    wallsSide = [],
+    wallsUp = [],
+    wallsDown = [],
     powers = [],
     colisionLimit = [],
 
     mapTile = [
-        "PPWxxxxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxxBxWxxxxxxxxxxxxxxxxxxxxxxx",
-        "Wxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxWxxWxxxxxxxxxxxxxxxxxxxxxxx",
-        "WPxPPxxxxxxxxxxxxxxxxxxxxxxxx",
-        "xPWPPWxxxxxxxxxxxxxxxxxxxxxxx",
-        "PPPPxxxxxxxxxxxxxxxxxxxxxxxxx",
-        "PPPPxWxxxxxxxxxxxxxxxxxxxxxxx",
-        "PPxPPxxxxxxxxxxxxxxxxxxxxxxxx",
-        "PPxPPWxxxxxxxxxxxxxxxxxxxxxxx",
-        "PPxxPxxxxxxxxxxxxxxxxxxxxxxxx",
-        "PPPxPWxxxxxxxxxxxxxxxxxxxxxxx",
-        "PPPWPxxxxxxxxxxxxxxxxxxxxxxxx",
-        "PxxxPWxxxxxxxxxxxxxxxxxxxxxxx",
-        "PWPxPxxxxxxxxxxxxxxxxxxxxxxxx",
-        "PPxPPWxxxxxxxxxxxxxxxxxxxxxxx",
-        "PPxxPxxxxxxxxxxxxxxxxxxxxxxxx",
-        "PPPPxWxxxxxxxxxxxxxxxxxxxxxxx"
+        "PPSxPxxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxSBDxxxxxxxxxxxxxxxxxxxxxxx",
+        "WxSxSxxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
+        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
+        "WPUPUxxxxxxxxxxxxxxxxxxxxxxxx"
+
 
     ];
 
@@ -76,12 +80,13 @@ var PlatfomsScena = false;
 const ModelBlock = './assets/models/Platforms/Block.fbx';
 const ModelWood = './assets/models/Platforms/Wood.fbx';
 const ModelMetal = './assets/models/Platforms/Metal.fbx';
+const ModelCloud = './assets/models/Platforms/Cloud.fbx';
 
 const ModelSpike = './assets/models/Platforms/Spikes.fbx';
 const ModelCoco = './assets/models/Props/fruits/Coco/Coco.fbx';
 const ModelBanana = './assets/models/Props/fruits/Banana/Banana.fbx';
 const ModelMango = './assets/models/Props/fruits/Mango/Mango.fbx';
-const ModelCloud = './assets/models/Platforms/Cloud.fbx';
+
 
 var consolehtml = document.getElementById("console");
 
@@ -91,15 +96,25 @@ for (let i = 0; i < mapTile.length; i++) {
     for (let y = 0; y < mapTile[i].length; y++) {
         switch (mapTile[i][y]) {
             case "x":
-                console.log("x");
+
                 break;
-            case "P": CargadoModelo(ModelBlock, "P", .015, .02, .04, 0, posicion.y - 1.48, posicion.z);
-                console.log("P");
+                // PLATFORM
+            case "P": CargadoModelo(ModelCloud, "P", .015, .02, .04, 0, posicion.y - 1.48, posicion.z);
+
                 break;
+                // SIDE
             case "W": CargadoModelo(ModelWood, "W", .015, .14, .04, 0, posicion.y + 2, posicion.z);
 
-                console.log("W");
+
                 break;
+            case "U": CargadoModelo(ModelWood, "U", .015, .14, .04, 0, posicion.y + 2, posicion.z);
+
+
+                break;
+                // /WALLSIDE
+            case "S": CargadoModelo(ModelWood, "S", .015, .14, .04, 0, posicion.y + 2, posicion.z);
+                break;
+                // FRUTA
             case "B": CargadoModelo(ModelCoco, "B", .010, .010, .010, 0, posicion.y, posicion.z);
                 break;
             default:
@@ -243,6 +258,18 @@ function CargadoModelo(path, type, Sx, Sy, Sz, Px, Py, Pz) {
             PowerMap = new fruit(scene, model, geometry, Px, Py, Pz);
             powers.push(PowerMap);
 
+        } else if (type == "S") { // ///Banana
+            wallSideMap = new wall(scene, model, geometry, Px, Py, Pz);
+            wallsSide.push(wallSideMap);
+
+        } else if (type == "U") { // ///Banana
+            wallSideMap = new wall(scene, model, geometry, Px, Py, Pz);
+            wallsUp.push(wallSideMap);
+
+        } else if (type == "D") { // ///Banana
+            wallSideMap = new wall(scene, model, geometry, Px, Py, Pz);
+            wallsDown.push(wallSideMap);
+
         }
 
 
@@ -335,10 +362,10 @@ function onWindowResize() {
 
 window.addEventListener('resize', onWindowResize, false);
 
-function updatePhysics(platforms, walls, powers) {
+function updatePhysics(platforms, walls, wallsSide, wallsUp, wallsDown, powers) {
     if (PlatfomsScena) {
-        player1.gravity(platforms, walls, powers, gravity);
-        player2.gravity(platforms, walls, powers, gravity);
+        player1.gravity(platforms, walls, wallsSide, wallsUp, wallsDown, powers, gravity);
+        player2.gravity(platforms, walls, wallsSide, wallsUp, wallsDown, powers, gravity);
 
     }
 
@@ -353,7 +380,7 @@ function animate() {
 
     TWEEN.update(); // Log de la posición actual del objeto
     if (cargadoModel) {
-        updatePhysics(platforms, walls, powers);
+        updatePhysics(platforms, walls, wallsSide, wallsUp, wallsDown, powers);
         mixer.update(0.016);
         mixer2.update(0.016);
 
@@ -373,7 +400,7 @@ function animate() {
         player2.input(Key.UP, Key.LEFT, Key.RIGHT);
 
 
-        consolehtml.innerHTML = "Posición del personaje:" + "<br>X:" + player1.getPositionX() + "  Y:" + player1.getPositionY() + "  Z:" + player1.getPositionZ() + "<br>Piso:" + player1.touchFloor;
+        consolehtml.innerHTML = "Posición del personaje:" + "<br>X:" + player1.getPositionX() + "  Y:" + player1.getPositionY() + "  Z:" + player1.getPositionZ() + "<br>Piso:" + player1.touchFloor + "<br>Wall:" + player1.touchWall;
 
 
     }

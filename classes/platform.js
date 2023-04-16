@@ -9,4 +9,6 @@ export class platform {
         this.mesh.geometry = geometry;
         this.scene.add(this.mesh);
     }
+
+
 }
