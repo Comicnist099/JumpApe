@@ -1,11 +1,22 @@
-init();
-
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
-import {platform} from './classes/platform.js';
-import {players} from './classes/players.js';
-import {wall} from './classes/wall.js';
-import {fruit} from './classes/fruit.js';
-import {FBXLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/FBXLoader.js';
+import {
+    platform
+} from './classes/platform.js';
+import {
+    players
+} from './classes/players.js';
+import {
+    wall
+} from './classes/wall.js';
+import {
+    fruit
+} from './classes/fruit.js';
+import {
+    enemy
+} from './classes/enemy.js';
+import {
+    FBXLoader
+} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/FBXLoader.js';
 /* import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js';
 import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
  */
@@ -17,16 +28,17 @@ var container,
     scene,
     renderer,
     renderer2;
-if (!Detector.webgl) 
+if (!Detector.webgl)
     Detector.addGetWebGLMessage();
 
-
+var deltatime;
 
 // GRAVEDAD
 var gravity = new THREE.Vector3(0, -0.01, 0);
 // JUGADORES
 var player1,
     player2;
+var paused = false;
 // CARGADO DE MODELOS
 var loader = new FBXLoader();
 // MODELOS
@@ -41,35 +53,22 @@ var PlataformMap,
     wallSideMap,
     PowerMap;
 // ARREGLOS DE OBJETOS
-var posicion = new THREE.Vector3(0, -10, + 20);
+var posicion = new THREE.Vector3(0, -10, +20);
 var platforms = [],
     walls = [],
     wallsSide = [],
     wallsUp = [],
     wallsDown = [],
+    Enemys = [],
     powers = [],
     colisionLimit = [],
 
     mapTile = [
-        "PPSxPxxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxSBDxxxxxxxxxxxxxxxxxxxxxxx",
-        "WxSxSxxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
-        "xxSxSWxxxxxxxxxxxxxxxxxxxxxxx",
-        "WPUPUxxxxxxxxxxxxxxxxxxxxxxxx"
-
-
+        "BxPMxxx",
+        "xxDDDxx",
+        "xxSSSxx",
+        "xxUUUxx",
+        "Wxxxxxx"
     ];
 
 
@@ -86,148 +85,163 @@ const ModelSpike = './assets/models/Platforms/Spikes.fbx';
 const ModelCoco = './assets/models/Props/fruits/Coco/Coco.fbx';
 const ModelBanana = './assets/models/Props/fruits/Banana/Banana.fbx';
 const ModelMango = './assets/models/Props/fruits/Mango/Mango.fbx';
-
+const ModelMoai = './assets/models/Enemy/Moai.fbx';
+const clock = new THREE.Clock();
 
 var consolehtml = document.getElementById("console");
+var boton = document.getElementById("miBoton");
 
-for (let i = 0; i < mapTile.length; i++) {
-    posicion.y = posicion.y + 10;
-    let posZ = posicion.z;
-    for (let y = 0; y < mapTile[i].length; y++) {
-        switch (mapTile[i][y]) {
-            case "x":
-
-                break;
-                // PLATFORM
-            case "P": CargadoModelo(ModelCloud, "P", .015, .02, .04, 0, posicion.y - 1.48, posicion.z);
-
-                break;
-                // SIDE
-            case "W": CargadoModelo(ModelWood, "W", .015, .14, .04, 0, posicion.y + 2, posicion.z);
+boton.addEventListener("click", function () {
+    init();
 
 
-                break;
-            case "U": CargadoModelo(ModelWood, "U", .015, .14, .04, 0, posicion.y + 2, posicion.z);
+
+    loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
+        var animations = [];
+        MonkeyFBX = fbx;
+        MonkeyFBX.scale.set(.0015, .0015, .0015);
+        // Crear el objeto Mixer para reproducir las animaciones del modelo
+        mixer2 = new THREE.AnimationMixer(MonkeyFBX);
+        var run = mixer2.clipAction(MonkeyFBX.animations[1]);
+        var idle = mixer2.clipAction(MonkeyFBX.animations[0]);
+        var jump = mixer2.clipAction(MonkeyFBX.animations[2]);
+        var climb = mixer2.clipAction(MonkeyFBX.animations[3]);
+
+        animations.push(run);
+        animations.push(idle);
+        animations.push(jump);
+        animations.push(climb);
+
+        // Obtener la animación del modelo y crear una instancia de la animación
+        MonkeyFBX.traverse(child => {
+            if (child.isMesh) {
+                child.AmbientLighty = -10;
+                child.material.transparent = false; // Hacer el material transparente
+                child.material.side = THREE.DoubleSide; // Configurar la visualización de las caras del material
+                child.material.metalness = 0.8; // Configurar la reflectividad del material
+                child.material.roughness = 0.2; // Configurar la suavidad del material
+                child.material.envMapIntensity = 1; // Configurar la intensidad del mapa de entorno del material
+                child.material.needsUpdate = true; // Asegurarse de que el material se actualice correctamente
+
+            }
+        });
 
 
-                break;
-                // /WALLSIDE
-            case "S": CargadoModelo(ModelWood, "S", .015, .14, .04, 0, posicion.y + 2, posicion.z);
-                break;
-                // FRUTA
-            case "B": CargadoModelo(ModelCoco, "B", .010, .010, .010, 0, posicion.y, posicion.z);
-                break;
-            default:
-                break;
+        player2 = new players(0, 5, 0, scene, MonkeyFBX, animations)
+        scene.add(player2.getMesh());
+        cargadoModel = true;
+
+
+    }, undefined, (error) => {
+        console.error('Error al cargar el modelo FBX:', error);
+    });
+
+
+    loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
+        var animations = [];
+        MonkeyFBX = fbx;
+        MonkeyFBX.scale.set(.0015, .0015, .0015);
+        // Crear el objeto Mixer para reproducir las animaciones del modelo
+        mixer = new THREE.AnimationMixer(MonkeyFBX);
+        var run = mixer.clipAction(MonkeyFBX.animations[1]);
+        var idle = mixer.clipAction(MonkeyFBX.animations[0]);
+        var jump = mixer.clipAction(MonkeyFBX.animations[2]);
+        var climb = mixer.clipAction(MonkeyFBX.animations[3]);
+
+        animations.push(run);
+        animations.push(idle);
+        animations.push(jump);
+        animations.push(climb);
+
+        // Obtener la animación del modelo y crear una instancia de la animación
+        MonkeyFBX.traverse(child => {
+            if (child.isMesh) {
+                child.AmbientLighty = -10;
+                child.material.transparent = false; // Hacer el material transparente
+                child.material.side = THREE.DoubleSide; // Configurar la visualización de las caras del material
+                child.material.metalness = 0.8; // Configurar la reflectividad del material
+                child.material.roughness = 0.2; // Configurar la suavidad del material
+                child.material.envMapIntensity = 1; // Configurar la intensidad del mapa de entorno del material
+                child.material.needsUpdate = true; // Asegurarse de que el material se actualice correctamente
+
+            }
+        });
+
+        player1 = new players(0, 5, 0, scene, MonkeyFBX, animations)
+        scene.add(player1.getMesh());
+        cargadoModel = true;
+
+
+    }, undefined, (error) => {
+        console.error('Error al cargar el modelo FBX:', error);
+    });
+
+
+
+
+    for (let i = 0; i < mapTile.length; i++) {
+        posicion.y = posicion.y + 10;
+        let posZ = posicion.z;
+        for (let y = 0; y < mapTile[i].length; y++) {
+            switch (mapTile[i][y]) {
+                case "x":
+
+                    break;
+                    // PLATFORM
+                case "P":
+                    CargadoModelo(ModelCloud, "P", .015, .02, .04, 0, posicion.y - 1.48, posicion.z);
+
+                    break;
+                    // SIDE
+                case "W":
+                    CargadoModelo(ModelWood, "W", .015, .14, .04, 0, posicion.y + 2, posicion.z);
+
+
+                    break;
+                case "U":
+                    CargadoModelo(ModelWood, "U", .015, .14, .04, 0, posicion.y + 2, posicion.z);
+
+
+                    break;
+                case "D":
+                    CargadoModelo(ModelWood, "D", .015, .14, .04, 0, posicion.y + 2, posicion.z);
+                    break;
+                    // /WALLSIDE
+                case "S":
+                    CargadoModelo(ModelWood, "S", .015, .14, .04, 0, posicion.y + 2, posicion.z);
+                    break;
+                    // FRUTA
+                case "B":
+                    CargadoModelo(ModelCoco, "B", .010, .010, .010, 0, posicion.y, posicion.z);
+                    break;
+                case "M":
+                    CargadoModelo(ModelMoai, "M", .030, .030, .030, 0, posicion.y, posicion.z);
+                    break;
+
+                default:
+                    break;
+            }
+            posicion.z = posicion.z - 10;
         }
-        posicion.z = posicion.z - 10;
+        posicion.z = posZ;
     }
-    posicion.z = posZ;
-}
 
-/* // B=FRUITS, P=PLATFORMS W=WALL
-// CARGARMODELO(modelo,"tipoObjeto,escalaX,escalaY,escala,Z,posicionX,posicionY,posicionZ")
-// FRUITS
-CargadoModelo(ModelMango, "B", .0010, .0010, .0010, 0, 30, 5);
-CargadoModelo(ModelCoco, "B", .010, .010, .010, 0, 10, 5);
-CargadoModelo(ModelBanana, "B", .010, .010, .010, 0, 10, 0);
-// /PLATFORMS
-CargadoModelo(ModelWood, "P", .015, .010, .08, 0, 6, 0);
-CargadoModelo(ModelMetal, "P", .015, .010, .03, 0, 0, 0);
-CargadoModelo(ModelMetal, "P", .015, .010, .015, 0, 26.5, -5);
-// WALLS
-CargadoModelo(ModelWood, "W", .015, .21, .009, 0, 25, 10);
-CargadoModelo(ModelWood, "W", .015, .21, .009, 0, 15, -5);
- */
+    // B=FRUITS, P=PLATFORMS W=WALL
+    var textureLoader = new THREE.TextureLoader();
 
-loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
-    var animations = [];
-    MonkeyFBX = fbx;
-    MonkeyFBX.scale.set(.0015, .0015, .0015);
-    // Crear el objeto Mixer para reproducir las animaciones del modelo
-    mixer2 = new THREE.AnimationMixer(MonkeyFBX);
-    var run = mixer2.clipAction(MonkeyFBX.animations[1]);
-    var idle = mixer2.clipAction(MonkeyFBX.animations[0]);
-    var jump = mixer2.clipAction(MonkeyFBX.animations[2]);
-    var climb = mixer2.clipAction(MonkeyFBX.animations[3]);
-
-    animations.push(run);
-    animations.push(idle);
-    animations.push(jump);
-    animations.push(climb);
-
-    // Obtener la animación del modelo y crear una instancia de la animación
-    MonkeyFBX.traverse(child => {
-        if (child.isMesh) {
-            child.AmbientLighty = -10;
-            child.material.transparent = false; // Hacer el material transparente
-            child.material.side = THREE.DoubleSide; // Configurar la visualización de las caras del material
-            child.material.metalness = 0.8; // Configurar la reflectividad del material
-            child.material.roughness = 0.2; // Configurar la suavidad del material
-            child.material.envMapIntensity = 1; // Configurar la intensidad del mapa de entorno del material
-            child.material.needsUpdate = true; // Asegurarse de que el material se actualice correctamente
-
-        }
+    // Carga la imagen del fondo
+    textureLoader.load('./assets/img/chango.png', function (texture) { // Configura la propiedad background de la escena con la textura cargada
+        scene.background = texture;
     });
 
 
-    player2 = new players(0, 5, 0, scene, MonkeyFBX, animations)
-    scene.add(player2.getMesh());
-    cargadoModel = true;
+    animate();
+    CargadoModelo(ModelBlock, "P", .015, .02, .04, 0, -10, 0);
+    CargadoModelo(ModelMetal, "P", .015, .02, .04, 0, -6, 10);
+    CargadoModelo(ModelBanana, "B", .010, .010, .010, 0, 0, 10);
+    CargadoModelo(ModelMango, "B", .0010, .0010, .0010, 0, -10, 10);
 
-
-}, undefined, (error) => {
-    console.error('Error al cargar el modelo FBX:', error);
 });
-
-
-loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
-    var animations = [];
-    MonkeyFBX = fbx;
-    MonkeyFBX.scale.set(.0015, .0015, .0015);
-    // Crear el objeto Mixer para reproducir las animaciones del modelo
-    mixer = new THREE.AnimationMixer(MonkeyFBX);
-    var run = mixer.clipAction(MonkeyFBX.animations[1]);
-    var idle = mixer.clipAction(MonkeyFBX.animations[0]);
-    var jump = mixer.clipAction(MonkeyFBX.animations[2]);
-    var climb = mixer.clipAction(MonkeyFBX.animations[3]);
-
-    animations.push(run);
-    animations.push(idle);
-    animations.push(jump);
-    animations.push(climb);
-
-    // Obtener la animación del modelo y crear una instancia de la animación
-    MonkeyFBX.traverse(child => {
-        if (child.isMesh) {
-            child.AmbientLighty = -10;
-            child.material.transparent = false; // Hacer el material transparente
-            child.material.side = THREE.DoubleSide; // Configurar la visualización de las caras del material
-            child.material.metalness = 0.8; // Configurar la reflectividad del material
-            child.material.roughness = 0.2; // Configurar la suavidad del material
-            child.material.envMapIntensity = 1; // Configurar la intensidad del mapa de entorno del material
-            child.material.needsUpdate = true; // Asegurarse de que el material se actualice correctamente
-
-        }
-    });
-
-    player1 = new players(0, 5, 0, scene, MonkeyFBX, animations)
-    scene.add(player1.getMesh());
-    cargadoModel = true;
-
-
-}, undefined, (error) => {
-    console.error('Error al cargar el modelo FBX:', error);
-});
-
-// //Importar
-var textureLoader = new THREE.TextureLoader();
-
-// Carga la imagen del fondo
-textureLoader.load('./assets/img/chango.png', function (texture) { // Configura la propiedad background de la escena con la textura cargada
-    scene.background = texture;
-});
-
 
 function CargadoModelo(path, type, Sx, Sy, Sz, Px, Py, Pz) {
     loader.load(path, (fbx) => {
@@ -270,6 +284,9 @@ function CargadoModelo(path, type, Sx, Sy, Sz, Px, Py, Pz) {
             wallSideMap = new wall(scene, model, geometry, Px, Py, Pz);
             wallsDown.push(wallSideMap);
 
+        } else if (type == "M") {
+            wallSideMap = new enemy(scene, model, geometry, Px, Py, Pz);
+            Enemys.push(wallSideMap);
         }
 
 
@@ -279,9 +296,6 @@ function CargadoModelo(path, type, Sx, Sy, Sz, Px, Py, Pz) {
     });
 
 }
-
-animate();
-
 
 function init() {
     container = document.createElement('div');
@@ -321,10 +335,10 @@ function init() {
     light.shadow.mapSize.width = 1024;
     light.shadow.mapSize.height = 1024;
 
-    light.shadow.camera.left = - d;
+    light.shadow.camera.left = -d;
     light.shadow.camera.right = d;
     light.shadow.camera.top = d;
-    light.shadow.camera.bottom = - d;
+    light.shadow.camera.bottom = -d;
 
     light.shadow.camera.far = 3 * d;
     light.shadow.camera.near = d;
@@ -343,6 +357,7 @@ function init() {
 
 
 }
+
 function onWindowResize() {
     var aspect = window.innerWidth / window.innerHeight;
     var halfWidth = aspect / 2;
@@ -377,34 +392,47 @@ function updatePhysics(platforms, walls, wallsSide, wallsUp, wallsDown, powers) 
 
 
 function animate() {
-
-    TWEEN.update(); // Log de la posición actual del objeto
-    if (cargadoModel) {
-        updatePhysics(platforms, walls, wallsSide, wallsUp, wallsDown, powers);
-        mixer.update(0.016);
-        mixer2.update(0.016);
-
-        camera.position.copy(player1.getPosition());
-        camera.position.add(new THREE.Vector3(10, 2, 0));
-        camera.lookAt(player1.getPosition());
-
-        camera2.position.copy(player2.getPosition());
-        camera2.position.add(new THREE.Vector3(10, 2, 0));
-        camera2.lookAt(player2.getPosition());
-
-        for (let i = 0; i < powers.length; i++) {
-            powers[i].update();
-        }
-
-        player1.input(Key.SPACE, Key.A, Key.D);
-        player2.input(Key.UP, Key.LEFT, Key.RIGHT);
-
-
-        consolehtml.innerHTML = "Posición del personaje:" + "<br>X:" + player1.getPositionX() + "  Y:" + player1.getPositionY() + "  Z:" + player1.getPositionZ() + "<br>Piso:" + player1.touchFloor + "<br>Wall:" + player1.touchWall;
-
-
+    if (Key.isPressed(Key.P)) {
+        paused = !paused;
     }
 
+    if (!paused) {
+        TWEEN.update(); // Log de la posición actual del objeto
+
+        if (cargadoModel) {
+            updatePhysics(platforms, walls, wallsSide, wallsUp, wallsDown, powers);
+            mixer.update(0.016);
+            mixer2.update(0.016);
+
+            camera.position.copy(player1.getPosition());
+            camera.position.add(new THREE.Vector3(10, 2, 0));
+            camera.lookAt(player1.getPosition());
+
+            camera2.position.copy(player2.getPosition());
+            camera2.position.add(new THREE.Vector3(10, 2, 0));
+            camera2.lookAt(player2.getPosition());
+
+            for (let i = 0; i < powers.length; i++) {
+                powers[i].update();
+            }
+            for (let y = 0; y < Enemys.length; y++) {
+                Enemys[y].actualizarCubo(player1, player2);
+                Enemys[y].update();
+            }
+
+            player1.input(Key.SPACE, Key.A, Key.D);
+            player2.input(Key.UP, Key.LEFT, Key.RIGHT);
+
+            for (let y = 0; y < platforms.length; y++) {
+                platforms[y].colision(player1);
+
+            }
+
+
+            consolehtml.innerHTML = "Posición del personaje:" + "<br>X:" + player1.getPositionX() + "  Y:" + player1.getPositionY() + "  Z:" + player1.getPositionZ() + "<br>Piso:" + player1.touchFloor + "<br>Wall:" + player1.touchWall + "<br>Life: " + player1.life + "<br>Deltatime: " + player1.deltatime;
+
+        }
+    }
     // Llamada a la función para el siguiente frame de animación
     requestAnimationFrame(animate);
     render();
