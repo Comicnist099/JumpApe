@@ -15,12 +15,41 @@ import {
     enemy
 } from './classes/enemy.js';
 import {
+    groupColision
+} from './classes/groupColision.js';
+
+import {
     FBXLoader
 } from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/FBXLoader.js';
 /* import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js';
 import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
  */
 
+const groupColisions = new groupColision();
+
+/*
+FRUTAS: B=BANANA,C=COCO,M=MANGO
+WALLS:  D=WALLDOWN S=WALLSIDE U=WALLUP
+PLATFORM: P=PLATFORM
+*/
+const mapTile = [
+    "P.PWP.D",
+    "......S",
+    ".PW...S",
+    ".P....S",
+    "......U",
+    "....W.."
+];
+
+const mapElement = [
+    "B......",
+    "C....B.",
+    "E....C.",
+    ".....M.",
+    ".......",
+    "......."
+];
+var groupplayers = []
 // VENTANA
 var container,
     camera,
@@ -54,22 +83,14 @@ var PlataformMap,
     PowerMap;
 // ARREGLOS DE OBJETOS
 var posicion = new THREE.Vector3(0, -10, +20);
+var posicion2 = new THREE.Vector3(0, -10, +20);
 var platforms = [],
     walls = [],
     wallsSide = [],
     wallsUp = [],
     wallsDown = [],
     Enemys = [],
-    powers = [],
-    colisionLimit = [],
-
-    mapTile = [
-        "BxPMxxx",
-        "xxDDDxx",
-        "xxSSSxx",
-        "xxUUUxx",
-        "Wxxxxxx"
-    ];
+    powers = [];
 
 
 // CARGADO DE MODELOS
@@ -80,22 +101,42 @@ const ModelBlock = './assets/models/Platforms/Block.fbx';
 const ModelWood = './assets/models/Platforms/Wood.fbx';
 const ModelMetal = './assets/models/Platforms/Metal.fbx';
 const ModelCloud = './assets/models/Platforms/Cloud.fbx';
-
 const ModelSpike = './assets/models/Platforms/Spikes.fbx';
 const ModelCoco = './assets/models/Props/fruits/Coco/Coco.fbx';
 const ModelBanana = './assets/models/Props/fruits/Banana/Banana.fbx';
 const ModelMango = './assets/models/Props/fruits/Mango/Mango.fbx';
 const ModelMoai = './assets/models/Enemy/Moai.fbx';
-const clock = new THREE.Clock();
+
+//SOUND
+const platanoSound = './assets/music/platano.wav';
+const mangoSound = './assets/music/mango.wav';
+const cocoSound = './assets/music/coco.wav';
 
 var consolehtml = document.getElementById("console");
-var boton = document.getElementById("miBoton");
 
-boton.addEventListener("click", function () {
-    init();
+// Obtener la cadena de búsqueda de la URL
+const queryString = window.location.search;
 
+// Crear un objeto URLSearchParams a partir de la cadena de búsqueda
+const urlParams = new URLSearchParams(queryString);
 
+// Obtener el valor del parámetro 'variable1'
+const playersUrl = urlParams.get('players');
+const escenarioUrl = urlParams.get('escenario');
 
+init();
+
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load('./assets/music/jungle.wav', function (buffer) {
+    const sound = new THREE.Audio(listener);
+    sound.setBuffer(buffer);
+    sound.setLoop(true);
+    sound.setVolume(0.5);
+    sound.play();
+});
+const listener = new THREE.AudioListener();
+camera.add(listener);
+if (playersUrl == 2) {
     loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
         var animations = [];
         MonkeyFBX = fbx;
@@ -126,122 +167,164 @@ boton.addEventListener("click", function () {
             }
         });
 
-
-        player2 = new players(0, 5, 0, scene, MonkeyFBX, animations)
+        player2 = new players(0, 5, 0, scene, MonkeyFBX, animations);
+        groupplayers.push(player2);
         scene.add(player2.getMesh());
-        cargadoModel = true;
 
 
     }, undefined, (error) => {
         console.error('Error al cargar el modelo FBX:', error);
     });
+}
+loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
+    var animations = [];
+    MonkeyFBX = fbx;
+    MonkeyFBX.scale.set(.0015, .0015, .0015);
+    // Crear el objeto Mixer para reproducir las animaciones del modelo
+    mixer = new THREE.AnimationMixer(MonkeyFBX);
+    var run = mixer.clipAction(MonkeyFBX.animations[1]);
+    var idle = mixer.clipAction(MonkeyFBX.animations[0]);
+    var jump = mixer.clipAction(MonkeyFBX.animations[2]);
+    var climb = mixer.clipAction(MonkeyFBX.animations[3]);
 
+    animations.push(run);
+    animations.push(idle);
+    animations.push(jump);
+    animations.push(climb);
 
-    loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
-        var animations = [];
-        MonkeyFBX = fbx;
-        MonkeyFBX.scale.set(.0015, .0015, .0015);
-        // Crear el objeto Mixer para reproducir las animaciones del modelo
-        mixer = new THREE.AnimationMixer(MonkeyFBX);
-        var run = mixer.clipAction(MonkeyFBX.animations[1]);
-        var idle = mixer.clipAction(MonkeyFBX.animations[0]);
-        var jump = mixer.clipAction(MonkeyFBX.animations[2]);
-        var climb = mixer.clipAction(MonkeyFBX.animations[3]);
+    // Obtener la animación del modelo y crear una instancia de la animación
+    MonkeyFBX.traverse(child => {
+        if (child.isMesh) {
+            child.AmbientLighty = -10;
+            child.material.transparent = false; // Hacer el material transparente
+            child.material.side = THREE.DoubleSide; // Configurar la visualización de las caras del material
+            child.material.metalness = 0.8; // Configurar la reflectividad del material
+            child.material.roughness = 0.2; // Configurar la suavidad del material
+            child.material.envMapIntensity = 1; // Configurar la intensidad del mapa de entorno del material
+            child.material.needsUpdate = true; // Asegurarse de que el material se actualice correctamente
 
-        animations.push(run);
-        animations.push(idle);
-        animations.push(jump);
-        animations.push(climb);
-
-        // Obtener la animación del modelo y crear una instancia de la animación
-        MonkeyFBX.traverse(child => {
-            if (child.isMesh) {
-                child.AmbientLighty = -10;
-                child.material.transparent = false; // Hacer el material transparente
-                child.material.side = THREE.DoubleSide; // Configurar la visualización de las caras del material
-                child.material.metalness = 0.8; // Configurar la reflectividad del material
-                child.material.roughness = 0.2; // Configurar la suavidad del material
-                child.material.envMapIntensity = 1; // Configurar la intensidad del mapa de entorno del material
-                child.material.needsUpdate = true; // Asegurarse de que el material se actualice correctamente
-
-            }
-        });
-
-        player1 = new players(0, 5, 0, scene, MonkeyFBX, animations)
-        scene.add(player1.getMesh());
-        cargadoModel = true;
-
-
-    }, undefined, (error) => {
-        console.error('Error al cargar el modelo FBX:', error);
-    });
-
-
-
-
-    for (let i = 0; i < mapTile.length; i++) {
-        posicion.y = posicion.y + 10;
-        let posZ = posicion.z;
-        for (let y = 0; y < mapTile[i].length; y++) {
-            switch (mapTile[i][y]) {
-                case "x":
-
-                    break;
-                    // PLATFORM
-                case "P":
-                    CargadoModelo(ModelCloud, "P", .015, .02, .04, 0, posicion.y - 1.48, posicion.z);
-
-                    break;
-                    // SIDE
-                case "W":
-                    CargadoModelo(ModelWood, "W", .015, .14, .04, 0, posicion.y + 2, posicion.z);
-
-
-                    break;
-                case "U":
-                    CargadoModelo(ModelWood, "U", .015, .14, .04, 0, posicion.y + 2, posicion.z);
-
-
-                    break;
-                case "D":
-                    CargadoModelo(ModelWood, "D", .015, .14, .04, 0, posicion.y + 2, posicion.z);
-                    break;
-                    // /WALLSIDE
-                case "S":
-                    CargadoModelo(ModelWood, "S", .015, .14, .04, 0, posicion.y + 2, posicion.z);
-                    break;
-                    // FRUTA
-                case "B":
-                    CargadoModelo(ModelCoco, "B", .010, .010, .010, 0, posicion.y, posicion.z);
-                    break;
-                case "M":
-                    CargadoModelo(ModelMoai, "M", .030, .030, .030, 0, posicion.y, posicion.z);
-                    break;
-
-                default:
-                    break;
-            }
-            posicion.z = posicion.z - 10;
         }
-        posicion.z = posZ;
+    });
+
+    player1 = new players(0, 5, 0, scene, MonkeyFBX, animations)
+    groupplayers.push(player1);
+    scene.add(player1.getMesh());
+    cargadoModel = true;
+
+
+}, undefined, (error) => {
+    console.error('Error al cargar el modelo FBX:', error);
+});
+
+
+
+for (let i = 0; i < mapElement.length; i++) {
+    posicion2.y = posicion2.y + 10;
+    let posZ = posicion2.z;
+    for (let y = 0; y < mapElement[i].length; y++) {
+        switch (mapElement[i][y]) {
+            // FRUTA BANANA
+            case "B":
+                CargadoModelo(ModelBanana, "B", .010, .010, .010, 0, posicion2.y, posicion2.z);
+                break;
+                // FRUTA MANGO
+            case "M":
+                CargadoModelo(ModelMango, "M", .0010, .0010, .0010, 0, posicion2.y, posicion2.z);
+                break;
+                // FRUTA COCO
+            case "C":
+                CargadoModelo(ModelCoco, "C", .010, .010, .010, 0, posicion2.y, posicion2.z);
+                break;
+            case "E":
+                CargadoModelo(ModelMoai, "E", .030, .030, .030, 0, posicion.y, posicion.z);
+                break;
+
+            default:
+                break;
+        }
+        posicion2.z = posicion2.z - 10;
     }
+    posicion2.z = posZ;
+}
 
-    // B=FRUITS, P=PLATFORMS W=WALL
-    var textureLoader = new THREE.TextureLoader();
+for (let i = 0; i < mapTile.length; i++) {
+    posicion.y = posicion.y + 10;
+    let posZ = posicion.z;
+    for (let y = 0; y < mapTile[i].length; y++) {
+        switch (mapTile[i][y]) {
+            case "x":
 
-    // Carga la imagen del fondo
-    textureLoader.load('./assets/img/chango.png', function (texture) { // Configura la propiedad background de la escena con la textura cargada
+                break;
+                // PLATFORM
+            case "P":
+                CargadoModelo(ModelCloud, "P", .015, .01, .04, 0, posicion.y - 1.3, posicion.z);
+
+                break;
+                // SIDE
+            case "W":
+                CargadoModelo(ModelWood, "W", .015, .14, .04, 0, posicion.y + 2, posicion.z);
+                break;
+            case "U":
+                CargadoModelo(ModelWood, "U", .015, .14, .04, 0, posicion.y + 2, posicion.z);
+                break;
+            case "D":
+                CargadoModelo(ModelWood, "D", .015, .14, .04, 0, posicion.y + 2, posicion.z);
+                break;
+                // /WALLSIDE
+            case "S":
+                CargadoModelo(ModelWood, "S", .015, .14, .04, 0, posicion.y + 2, posicion.z);
+                break;
+                // FRUTA BANANA
+            case "B":
+                CargadoModelo(ModelBanana, "B", .010, .010, .010, 0, posicion.y, posicion.z);
+                break;
+                // FRUTA MANGO
+            case "M":
+                CargadoModelo(ModelMango, "M", .0010, .0010, .0010, 0, posicion.y, posicion.z);
+                break;
+                // FRUTA COCO
+            case "C":
+                CargadoModelo(ModelCoco, "C", .010, .010, .010, 0, posicion.y, posicion.z);
+                break;
+            case "E":
+                CargadoModelo(ModelMoai, "E", .030, .030, .030, 0, posicion.y, posicion.z);
+                break;
+
+            default:
+                break;
+        }
+        posicion.z = posicion.z - 10;
+    }
+    posicion.z = posZ;
+}
+// B=FRUITS, P=PLATFORMS W=WALL
+var textureLoader = new THREE.TextureLoader();
+const junglaFondo = './assets/img/chango.png';
+const spaceFondo = './assets/img/space.png'
+const builtFondo = './assets/img/space.png'
+// Carga la imagen del fondo
+
+function fondo(path) {
+    textureLoader.load(path, function (texture) { // Configura la propiedad background de la escena con la textura cargada
         scene.background = texture;
     });
+}
+
+switch (escenarioUrl) {
+    case '1':
+        fondo(junglaFondo);
+        break;
+    case '2':
+        fondo(spaceFondo);
+        break;
+    case '3':
+        fondo(builtFondo);
+        break;
+}
 
 
-    animate();
-    CargadoModelo(ModelBlock, "P", .015, .02, .04, 0, -10, 0);
-    CargadoModelo(ModelMetal, "P", .015, .02, .04, 0, -6, 10);
-    CargadoModelo(ModelBanana, "B", .010, .010, .010, 0, 0, 10);
-    CargadoModelo(ModelMango, "B", .0010, .0010, .0010, 0, -10, 10);
 
-});
+animate();
 
 function CargadoModelo(path, type, Sx, Sy, Sz, Px, Py, Pz) {
     loader.load(path, (fbx) => {
@@ -269,22 +352,30 @@ function CargadoModelo(path, type, Sx, Sy, Sz, Px, Py, Pz) {
             walls.push(wallMap);
 
         } else if (type == "B") { // ///Banana
-            PowerMap = new fruit(scene, model, geometry, Px, Py, Pz);
+            PowerMap = new fruit(scene, model, geometry, Px, Py, Pz, platanoSound, 'banana');
             powers.push(PowerMap);
 
-        } else if (type == "S") { // ///Banana
+        } else if (type == "C") { // ///Coco
+            PowerMap = new fruit(scene, model, geometry, Px, Py, Pz, cocoSound, 'coco');
+            powers.push(PowerMap);
+
+        } else if (type == "M") { // ///Mango
+            PowerMap = new fruit(scene, model, geometry, Px, Py, Pz, mangoSound, 'mango');
+            powers.push(PowerMap);
+
+        } else if (type == "S") { // ///WALL SIDE
             wallSideMap = new wall(scene, model, geometry, Px, Py, Pz);
             wallsSide.push(wallSideMap);
 
-        } else if (type == "U") { // ///Banana
+        } else if (type == "U") { // //WALL UP
             wallSideMap = new wall(scene, model, geometry, Px, Py, Pz);
             wallsUp.push(wallSideMap);
 
-        } else if (type == "D") { // ///Banana
+        } else if (type == "D") { // //WALL DOWN
             wallSideMap = new wall(scene, model, geometry, Px, Py, Pz);
             wallsDown.push(wallSideMap);
 
-        } else if (type == "M") {
+        } else if (type == "E") { //ENEMY
             wallSideMap = new enemy(scene, model, geometry, Px, Py, Pz);
             Enemys.push(wallSideMap);
         }
@@ -307,10 +398,14 @@ function init() {
 
 
     // camera
+    if (playersUrl == 2) {
+        camera = new THREE.PerspectiveCamera(120, window.innerWidth / 2 / window.innerHeight, 0.1, 1000);
+        camera2 = new THREE.PerspectiveCamera(120, window.innerWidth / 2 / window.innerHeight, 0.1, 1000);
+    } else {
+        camera = new THREE.PerspectiveCamera(120, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera2 = new THREE.PerspectiveCamera(120, window.innerWidth / 2 / window.innerHeight, 0.1, 1000);
 
-    camera = new THREE.PerspectiveCamera(120, window.innerWidth / 2 / window.innerHeight, 0.1, 1000);
-    camera2 = new THREE.PerspectiveCamera(120, window.innerWidth / 2 / window.innerHeight, 0.1, 1000);
-
+    }
     camera.position.set(10, 0, 0);
     camera.lookAt(0, 0, 0);
     camera2.position.set(10, 0, 0);
@@ -319,7 +414,8 @@ function init() {
     camera2.quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2);
 
     scene.add(camera);
-    scene.add(camera2);
+    if (playersUrl == 2)
+        scene.add(camera2);
     // lights
     var light;
     scene.add(new THREE.AmbientLight(0x666666));
@@ -343,55 +439,59 @@ function init() {
     light.shadow.camera.far = 3 * d;
     light.shadow.camera.near = d;
     light.shadow.darkness = 0.5;
+    if (playersUrl == 2) {
+        scene.add(light);
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth / 2.03, window.innerHeight);
+        renderer.setViewport(0, 0, window.innerWidth / 2.03, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-    scene.add(light);
-    renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth / 2.03, window.innerHeight);
-    renderer.setViewport(0, 0, window.innerWidth / 2.03, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-
-    renderer2 = new THREE.WebGLRenderer();
-    renderer2.setSize(window.innerWidth / 2.03, window.innerHeight);
-    renderer2.setViewport(0, 0, window.innerWidth / 2.03, window.innerHeight);
-    document.body.appendChild(renderer2.domElement);
-
+        renderer2 = new THREE.WebGLRenderer();
+        renderer2.setSize(window.innerWidth / 2.03, window.innerHeight);
+        renderer2.setViewport(0, 0, window.innerWidth / 2.03, window.innerHeight);
+        document.body.appendChild(renderer2.domElement);
+    } else {
+        scene.add(light);
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+    }
 
 }
 
 function onWindowResize() {
     var aspect = window.innerWidth / window.innerHeight;
-    var halfWidth = aspect / 2;
 
-    camera.aspect = halfWidth;
-    camera.updateProjectionMatrix();
+    if (playersUrl == 2) {
+        var halfWidth = aspect / 2;
+        camera.aspect = halfWidth;
+        camera.updateProjectionMatrix();
 
-    camera2.aspect = halfWidth;
-    camera2.updateProjectionMatrix();
+        camera2.aspect = halfWidth;
+        camera2.updateProjectionMatrix();
 
-    renderer.setSize(window.innerWidth / 2.03, window.innerHeight);
-    renderer.setViewport(0, 0, window.innerWidth / 2.03, window.innerHeight);
+        renderer.setSize(window.innerWidth / 2.03, window.innerHeight);
+        renderer.setViewport(0, 0, window.innerWidth / 2.03, window.innerHeight);
 
-    renderer2.setSize(window.innerWidth / 2.03, window.innerHeight);
-    renderer2.setViewport(0, 0, window.innerWidth / 2.03, window.innerHeight);
+        renderer2.setSize(window.innerWidth / 2.03, window.innerHeight);
+        renderer2.setViewport(0, 0, window.innerWidth / 2.03, window.innerHeight);
+    } else {
+        var halfWidth = aspect;
+        var halfWidth = aspect;
+        camera.aspect = halfWidth;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+
+    }
 }
 
 window.addEventListener('resize', onWindowResize, false);
 
-function updatePhysics(platforms, walls, wallsSide, wallsUp, wallsDown, powers) {
-    if (PlatfomsScena) {
-        player1.gravity(platforms, walls, wallsSide, wallsUp, wallsDown, powers, gravity);
-        player2.gravity(platforms, walls, wallsSide, wallsUp, wallsDown, powers, gravity);
-
-    }
-
-
-    // Mover el objeto según su velocidad
-
-
-}
-
-
 function animate() {
+    console.log(playersUrl);
+
     if (Key.isPressed(Key.P)) {
         paused = !paused;
     }
@@ -399,37 +499,68 @@ function animate() {
     if (!paused) {
         TWEEN.update(); // Log de la posición actual del objeto
 
+
         if (cargadoModel) {
-            updatePhysics(platforms, walls, wallsSide, wallsUp, wallsDown, powers);
+
+            for (let y = 0; y < powers.length; y++) {
+                powers[y].update();
+                powers[y].colision(player1, powers);
+
+            }
+            if (playersUrl == 2) {
+                for (let y = 0; y < powers.length; y++) {
+                    powers[y].colision(player2, powers);
+                }
+            }
+            groupColisions.colision(groupplayers, platforms);
+            groupColisions.colisionWall(groupplayers, walls, true, true, true);
+            groupColisions.colisionWall(groupplayers, wallsUp, true, false, true);
+            groupColisions.colisionWall(groupplayers, wallsSide, false, false, true);
+            groupColisions.colisionWall(groupplayers, wallsDown, false, true, true);
+
+
+
+            if (playersUrl == 2) {
+                Enemys[0].actualizarCubo(player1, player2);
+            } else {
+                Enemys[0].actualizarCubo(player1, player1);
+
+            }
+            Enemys[0].update();
+
+
+            if (PlatfomsScena) {
+                player1.gravity(gravity);
+                if (playersUrl == 2)
+                    player2.gravity(gravity);
+
+            }
             mixer.update(0.016);
-            mixer2.update(0.016);
+            if (playersUrl == 2)
+                mixer2.update(0.016);
 
             camera.position.copy(player1.getPosition());
             camera.position.add(new THREE.Vector3(10, 2, 0));
             camera.lookAt(player1.getPosition());
-
-            camera2.position.copy(player2.getPosition());
-            camera2.position.add(new THREE.Vector3(10, 2, 0));
-            camera2.lookAt(player2.getPosition());
-
-            for (let i = 0; i < powers.length; i++) {
-                powers[i].update();
-            }
-            for (let y = 0; y < Enemys.length; y++) {
-                Enemys[y].actualizarCubo(player1, player2);
-                Enemys[y].update();
-            }
-
             player1.input(Key.SPACE, Key.A, Key.D);
-            player2.input(Key.UP, Key.LEFT, Key.RIGHT);
 
-            for (let y = 0; y < platforms.length; y++) {
-                platforms[y].colision(player1);
+            if (playersUrl == 2) {
+                camera2.position.copy(player2.getPosition());
+                camera2.position.add(new THREE.Vector3(10, 2, 0));
+                camera2.lookAt(player2.getPosition());
+                player2.input(Key.UP, Key.LEFT, Key.RIGHT);
 
             }
 
 
-            consolehtml.innerHTML = "Posición del personaje:" + "<br>X:" + player1.getPositionX() + "  Y:" + player1.getPositionY() + "  Z:" + player1.getPositionZ() + "<br>Piso:" + player1.touchFloor + "<br>Wall:" + player1.touchWall + "<br>Life: " + player1.life + "<br>Deltatime: " + player1.deltatime;
+
+
+
+
+
+
+
+            consolehtml.innerHTML = "Posición del personaje:" + "<br>X:" + player1.getPositionX() + "  Y:" + player1.getPositionY() + "  Z:" + player1.getPositionZ() + "<br>Piso:" + player1.touchFloor + "<br>Wall:" + player1.touchWall + "<br>sidewall:" + player1.touchFloorWall + "<br>Life: " + player1.life + "<br>Deltatime: " + player1.deltatime;
 
         }
     }
@@ -442,6 +573,7 @@ function animate() {
 function render() { // Actualizar la posición del objeto del HUD para que siga a la cámara
 
     renderer.render(scene, camera);
-    renderer2.render(scene, camera2);
+    if (playersUrl == 2)
+        renderer2.render(scene, camera2);
 
 }

@@ -3,21 +3,71 @@
 	<head>
 		<meta charset="utf-8">
 		<title>My first three.js app</title>
-		<link rel="stylesheet" type="text/css" href="./css/console.css">
-
+		<link rel="stylesheet" href="./css/Estilos_Menu.css">
 		<style>
 			body { margin: 0; }
 		</style>
 	</head>
 	<body>
-		<p id=console></p>
-		<button id="miBoton">Iniciar juego</button>
-
-		<script src="js/keys.js"></script>
-		<script src="js/tween.js"></script>
-		<script src="./main.js" type="module">
-		<script src="js/input.js"></script>
-		<script src="js/cannon.js"></script>
-		<script src="js/detector.js"></script>
+<p id=console></p> 
+			<section class="showcase">
+				
+				<div class="video-container">
+					<video src="./resources/video_jungla.mp4" autoplay muted loop></video>
+				</div>
+				
+				<div class="container">
+					<img src="./resources/LOGO_SIN_BOTON.png" alt="alternatetext">
+					
+					<h3></h3>
+					
+					<button  id="button1" class="btn">
+						<img src="./resources/boton_jugar.png" alt="Jugar" width="20" height="60">
+					</button>
+		
+					<button href="#" id="button3" class="btn">
+						<img src="./resources/boton_ajustes.png" alt="Jugar" width="20" height="60">
+	
+					</button>
+	
+					<button href="./resources/Vistas_html/pagina_juego.html" id="button2" class="btn">
+						<img src="./resources/boton_puntuaciones.png" alt="Opciones" width="20" height="60">
+					</button>
+				</div>
+				
+			</section>
+			
+			<div class="opciones">
+				<div class="close" id="button1">x</div>
+				<h1>OPCIONES DE JUEGO</h1>	
+				
+				<a id="button1Player"> <img src="./resources/boton_single_player.png " alt="Jugar " width="220" height="155"></a>
+				<a id="button2Player"> <img src="./resources/boton_multi_player.png " alt="Jugar " width="280" height="150"></a>
+			</div>
+			<div class="dificultad">
+				<div class="close2">x</div>
+				<h1>PUNTUACIONES</h1>
+				<a class="dif1" href="game.html"> <img src="./resources/menu_puntuaciones.png " alt="Jugar " width="380" height="100"></a>
+				<a></a>
+			</div>
+			</div>
+			
+			<div class="escenarios">
+				<div class="close3">x</div>
+				<h1>Escenarios</h1>
+				<a id="button1Esc" class="dif1"> <img src="./resources/boton_modo_jungla.png " alt="Jugar " width="300" height="110"></a>
+				<a id="button2Esc" class="dif1"> <img src="./resources/boton_modo_espacio.png " alt="Jugar " width="300" height="110"></a>
+				<a id="button3Esc" class="dif1"> <img src="./resources/boton_modo_construccion.png " alt="Jugar " width="300" height="110"></a>
+			</div>
+			<div class="dificultad">
+				<div class="close3">x</div>
+				<h1>Escenarios</h1>
+				<a id="button1Esc" class="dif1"> <img src="./resources/boton_modo_jungla.png " alt="Jugar " width="300" height="110"></a>
+				<a id="button2Esc" class="dif1"> <img src="./resources/boton_modo_espacio.png " alt="Jugar " width="300" height="110"></a>
+				<a id="button3Esc" class="dif1"> <img src="./resources/boton_modo_construccion.png " alt="Jugar " width="300" height="110"></a>
+			</div>
+			<script type="text/javascript" src="./js/btns_menu.js"></script>
+		
+		
 	</body>
 </html>
