@@ -49,22 +49,17 @@ export class groupColision {
         }
     }
     colisionWall(players, arrayWall, up, down, side) {
-
         for (const element of arrayWall) {
-
             const wall = element;
-
             const box = new THREE.Box3();
             wall.mesh.geometry.computeBoundingBox();
             box.setFromObject(wall.mesh);
-
             const width = box.max.z - box.min.z;
             const height = box.max.y - box.min.y;
             const Py1 = wall.mesh.position.y + height / 2;
             const Py2 = wall.mesh.position.y - height / 2;
             const Pz1 = wall.mesh.position.z - width / 2;
             const Pz2 = wall.mesh.position.z + width / 2;
-
             for (const element of players) {
                 const player = element;
                 const Jy1 = player.mesh.position.y

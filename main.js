@@ -322,8 +322,6 @@ switch (escenarioUrl) {
         break;
 }
 
-
-
 animate();
 
 function CargadoModelo(path, type, Sx, Sy, Sz, Px, Py, Pz) {

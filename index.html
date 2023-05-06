@@ -1,73 +1,127 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
-		<meta charset="utf-8">
-		<title>My first three.js app</title>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="stylesheet" href="./css/Estilos_Menu.css">
-		<style>
-			body { margin: 0; }
-		</style>
+		<title>ApeUp - inicio</title>
 	</head>
 	<body>
-<p id=console></p> 
-			<section class="showcase">
-				
-				<div class="video-container">
-					<video src="./resources/videojungla.mp4" autoplay muted loop></video>
-				</div>
-				
-				<div class="container">
-					<img src="./resources/LOGO_SIN_BOTON.png" alt="alternatetext">
-					
-					<h3></h3>
-					
-					<button  id="button1" class="btn">
-						<img src="./resources/boton_jugar.png" alt="Jugar" width="20" height="60">
-					</button>
-		
-					<button href="#" id="button3" class="btn">
-						<img src="./resources/boton_ajustes.png" alt="Jugar" width="20" height="60">
-	
-					</button>
-	
-					<button href="./resources/Vistas_html/pagina_juego.html" id="button2" class="btn">
-						<img src="./resources/boton_puntuaciones.png" alt="Opciones" width="20" height="60">
-					</button>
-				</div>
-				
-			</section>
+		<div class="showcase">
 			
-			<div class="opciones">
-				<div class="close" id="button1">x</div>
-				<h1>OPCIONES DE JUEGO</h1>	
-				
-				<a id="button1Player"> <img src="./resources/boton_single_player.png " alt="Jugar " width="220" height="155"></a>
-				<a id="button2Player"> <img src="./resources/boton_multi_player.png " alt="Jugar " width="280" height="150"></a>
-			</div>
-			<div class="dificultad">
-				<div class="close2">x</div>
-				<h1>PUNTUACIONES</h1>
-				<a class="dif1" href="game.html"> <img src="./resources/menu_puntuaciones.png " alt="Jugar " width="380" height="100"></a>
-				<a></a>
-			</div>
+			<div class="video-container">
+				<video src="./resources/video_jungla.mp4" autoplay muted loop></video>
 			</div>
 			
-			<div class="escenarios">
-				<div class="close3">x</div>
-				<h1>Escenarios</h1>
-				<a id="button1Esc" class="dif1"> <img src="./resources/boton_modo_jungla.png " alt="Jugar " width="300" height="110"></a>
-				<a id="button2Esc" class="dif1"> <img src="./resources/boton_modo_espacio.png " alt="Jugar " width="300" height="110"></a>
-				<a id="button3Esc" class="dif1"> <img src="./resources/boton_modo_construccion.png " alt="Jugar " width="300" height="110"></a>
+			<div class="containerLOGO">
+				<img class="LOGO" src="./resources/LOGO_SIN_BOTON.png" alt="alternatetext">
 			</div>
-			<div class="dificultad">
-				<div class="close3">x</div>
-				<h1>Escenarios</h1>
-				<a id="button1Esc" class="dif1"> <img src="./resources/boton_modo_jungla.png " alt="Jugar " width="300" height="110"></a>
-				<a id="button2Esc" class="dif1"> <img src="./resources/boton_modo_espacio.png " alt="Jugar " width="300" height="110"></a>
-				<a id="button3Esc" class="dif1"> <img src="./resources/boton_modo_construccion.png " alt="Jugar " width="300" height="110"></a>
+
+			<div class="container">
+				
+				<button href="#" id="button1" class="btn">
+					<img src="./resources/boton_jugar.png" alt="Jugar" width="20" height="60">
+				</button>
+	
+				<button href="#" id="button3" class="btn">
+					<img src="./resources/boton_ajustes.png" alt="Jugar" width="20" height="60">
+				</button>
+
+				<button href="#" id="button2" class="btn">
+					<img src="./resources/boton_puntuaciones.png" alt="Opciones" width="20" height="60">
+				</button>
+
+				<button href="#" id="button5" class="btn btn_creditos">
+					<img src="./resources/boton_credits.png" alt="Opciones" width="10" height="30">
+				</button>
 			</div>
-			<script type="text/javascript" src="./js/btns_menu.js"></script>
+			
+		</div>
 		
+		<div class="opciones">
+			<div class="close" id="close2">x</div>
+			<h1>OPCIONES DE JUEGO</h1>
+			<a class="op1" id="button1Player" href="game.html"> <img src="./resources/boton_single_player.png " alt="Jugar " width="170" height="120"></a>
+			<a class="op2" id="button2Player" href="game.html"> <img src="./resources/boton_multi_player.png " alt="Jugar " width="200" height="110"></a>
+			<img id="btn_regresar" class="btn_regresar" src="./resources/boton_regresar.png " alt="atras " width="180px" height="70px">
+		</div>
+
+		<div class="puntuaciones">
+			<h1>PUNTUACIONES</h1>
+			<table class="">
+				<tr>
+					<th>Usuario</th>
+					<th>Puntaje</th>
+				</tr>
+				<tr>
+					<td>La Minna</td>
+					<td>100 puntos</td>
+				</tr>
+
+				<tr>
+					<td>La Ale</td>
+					<td>100 puntos</td>
+				</tr>
+			</table>
+			<img id="btn_regresar_puntuacion" class="btn_regresar" src="./resources/boton_regresar.png " alt="atras " width="180px" height="70px">
+		</div>
+		</div>
 		
+		<div class="escenarios">
+			<div id="close3" class="close3">x</div>
+			<h1>Escenarios</h1>
+			<a id="button1Esc" class="dif1" href="#"> <img src="./resources/boton_modo_jungla.png " alt="Jugar " width="300" height="110"></a>
+			<a id="button2Esc" class="dif1" href="#"> <img src="./resources/boton_modo_espacio.png " alt="Jugar " width="300" height="110"></a>
+			<a id="button3Esc" class="dif1" href="#"> <img src="./resources/boton_modo_construccion.png " alt="Jugar " width="300" height="110"></a>
+		</div>
+
+		<div class="Ajustes">
+			<h1> AJUSTES </h1>
+			<div class="musica">
+				<h3> MUSICA </h3>
+				<div>
+					<div class="slider-iconos">
+						<div class="iconos">
+							<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
+								<path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
+							</svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+								<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+							</svg>
+						</div>
+						<div class="slidecontainer">
+							<input type="range" min="1" max="100" value="50" class="slider" id="slider_musica">
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="efectos">
+				<h3> EFECTOS </h3>
+				<div>
+					<div class="slider-iconos">
+						<div class="iconos">
+							<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
+								<path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
+							</svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+								<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+							</svg>
+						</div>
+						<div class="slidecontainer">
+							<input type="range" min="1" max="100" value="50" class="slider" id="slider_efectos">
+						</div>
+					</div>
+				</div>
+			</div>
+			<img id="prueba" src="./resources/boton_regresar.png" alt="atras " width="180px" height="70px">
+		</div>
+
+		<div class="creditos">
+			<div class="close" id="button6">X</div>
+		</div>
+
+		<script type="text/javascript" src="./js/btns_menu.js"></script>
 	</body>
 </html>

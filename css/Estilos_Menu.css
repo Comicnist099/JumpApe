@@ -1,14 +1,18 @@
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 * {
 	margin: 0;
 	padding: 0;
 }
 
+@font-face {
+	font-family: RockyMonkey;
+	src: url(../resources/RockyMonkey.ttf);
+  }
+
 body {
 	font-family: 'Bebas Neue', cursive;
-	line-height: 1.5;
-	display: flex;
-	justify-content: center;
+    height: 100vh;
+	width: 100vw;
 }
 
 a {
@@ -17,12 +21,22 @@ a {
 }
 
 .showcase {
-	height: 100vh;
+	height: 100%;
+	width: 100%;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	text-align: center;
-	padding: 0 20px;
+}
+
+.containerLOGO{
+	height: 40%;
+	width: 100vw;
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
 }
 
 .video-container {
@@ -45,16 +59,19 @@ a {
 }
 
 .container {
+	display: flex;
+	flex-direction: column;
 	background: url("/menu.png") no-repeat center;
 	position: relative;
-	height: 550px;
-	width: 770px;
+	height: 70%;
+	width: 100vw;
 	z-index: 2;
 }
 
-.container img {
-	height: 220px;
-	width: 50%;
+.containerLOGO img {
+	height: 350px;
+	width: 45%;
+	z-index: 1;
 }
 
 .btn {
@@ -62,7 +79,6 @@ a {
 	padding: 0;
 	border: none;
 	background: none;
-	box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
 }
 
 .btn img {
@@ -81,17 +97,25 @@ a {
 
 .opciones {
 	position: absolute;
+	left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
 	text-align: center;
 	justify-content: center;
 	align-items: center;
 	margin-top: 150px;
 	z-index: 2;
-	height: 400px;
-	width: 500px;
+	height: 500px;
+	width: 325px;
 	border-radius: 20px;
-	box-shadow: 2px 2px 2px 1px rgba(0, 0, 0.5, 0.3);
-	background: rgba(173, 138, 43, 0.938);
+	background-image: url("../resources/tabla_fondo.png");
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
 	display: none;
+	flex-direction: column;
 }
 
 .opciones h1 {
@@ -107,14 +131,13 @@ a {
 	color: aliceblue;
 	font-size: 37px;
 	position: absolute;
-	top: 0;
-	right: 17px;
+	top: 20px;
+	right: 25px;
 	cursor: pointer;
 }
 
 .op1 {
 	cursor: pointer;
-	margin-bottom: 15px;
 	border: none;
 	background: none;
 }
@@ -133,30 +156,56 @@ a {
 	transform: scale(0.94);
 }
 
-.dificultad {
+.btn_regresar {
+	cursor: pointer;
+	border: none;
+	background: none;
+}
+
+.btn_regresar:hover {
+	transform: scale(0.94);
+}
+
+.puntuaciones {
+	background-image: url("../resources/tabla_fondo.png");
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
 	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+	padding-top: 30px;
 	text-align: center;
 	justify-content: center;
 	align-items: center;
 	margin-top: 150px;
 	z-index: 2;
-	height: 400px;
-	width: 500px;
-	border-radius: 20px;
-	box-shadow: 2px 2px 2px 1px rgba(0, 0, 0.5, 0.3);
-	background: rgba(173, 138, 43, 0.938);
-	display: none;
+	height: 450px;
+	width: 600px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
 }
 
-.dificultad h1 {
-	font-family: 'Bebas Neue', cursive;
-	color: aliceblue;
-	margin-top: 20px;
-	margin-bottom: 20px;
-	font-size: 37px;
+.puntuaciones h1 {
+	font-family: 'RockyMonkey';
+	color: #ffe7a7;
+	font-size: 20px;
 }
 
-.dificultad .close2 {
+.puntuaciones table {
+	font-family: 'RockyMonkey';
+	color: #ffe7a7;
+	font-size: 10px;
+	width: 50%;
+}
+
+
+.puntuaciones .close2 {
 	font-family: 'Bebas Neue', cursive;
 	color: aliceblue;
 	font-size: 37px;
@@ -168,23 +217,30 @@ a {
 
 .escenarios {
 	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	margin: auto;
 	text-align: center;
 	justify-content: center;
 	align-items: center;
 	margin-top: 150px;
 	z-index: 2;
-	height: 450px;
+	height: 550px;
 	width: 500px;
-	border-radius: 20px;
-	box-shadow: 2px 2px 2px 1px rgba(0, 0, 0.5, 0.3);
-	background: rgba(173, 138, 43, 0.938);
+	background-image: url("../resources/tabla_fondo.png");
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
 	display: none;
+	flex-direction: column;
 }
 
 .escenarios h1 {
 	font-family: 'Bebas Neue', cursive;
 	color: aliceblue;
-	margin-top: 20px;
+	margin-top: 90px;
 	margin-bottom: 20px;
 	font-size: 37px;
 }
@@ -194,7 +250,160 @@ a {
 	color: aliceblue;
 	font-size: 37px;
 	position: absolute;
-	top: 0;
-	right: 17px;
+	top: 20px;
+	right: 100px;
 	cursor: pointer;
 }
+
+.borde {
+	border: 1px solid black;
+}
+
+/* SLIDER STYLE */
+
+.slidecontainer {
+	width: 100%;
+  }
+  
+  .slider {
+	-webkit-appearance: none;
+	width: 100%;
+	height: 5px;
+	background: #d3d3d3;
+	outline: none;
+	opacity: 0.7;
+	-webkit-transition: .2s;
+	transition: opacity .2s;
+  }
+  
+  .slider:hover {
+	opacity: 1;
+  }
+  
+  .slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 20px;
+	height: 10px;
+	background: #ecb614;
+	cursor: pointer;
+  }
+  
+  .slider::-moz-range-thumb {
+	width: 25px;
+	height: 25px;
+	background: #ecb614;
+	cursor: pointer;
+  }
+
+  /*fin slider*/
+
+  .Ajustes{
+	display: none;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin: auto;
+	background-image: url("../resources/tabla_fondo.png");
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	height: 500px;
+	width: 325px;
+	z-index: 3;
+  }
+
+  .Ajustes h1{
+	font-family: RockyMonkey;
+   font-size: 35px;
+   margin-bottom: 15px;
+   color: #ffe7a7;
+  }
+
+  .Ajustes img {
+	margin-top: 40px;
+  }
+
+  .slider-iconos{
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+  }
+
+  .iconos{
+	font-size: 20px;
+	color: #ffe7a7;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	width: 100%;
+  }
+  
+  .musica {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	margin-bottom: 20px;
+  }
+
+  .musica h3{
+	font-family: RockyMonkey;
+	font-size: 20px;
+	margin-right: 10px;
+	color: #ffe7a7;
+  }
+
+  .efectos {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+  }
+
+  .efectos h3{
+	font-family: RockyMonkey;
+	margin-right: 30px;
+	font-size: 15px;
+	color: #ffe7a7;
+  }
+
+
+  .creditos {
+	display: none;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-end;
+	background-image: url("../resources/pantalla_credits.png");
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
+	height: 550px;
+	width: 500px;
+	margin: auto;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	z-index: 11;
+  }
+
+  #button6 {
+	font-family: RockyMonkey;
+	padding-right: 120px;
+	padding-top: 30px;
+	font-size: 35px;
+	color: #ffe7a7;
+	cursor: pointer;
+  }
+ 
+
+  
