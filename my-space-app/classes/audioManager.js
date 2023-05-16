@@ -4,6 +4,8 @@ export class audioManager {
     constructor() {
         this.listener = new THREE.AudioListener();
         this.audioLoader = new THREE.AudioLoader();
+        this.sound = new THREE.Audio(this.listener);
+        this.sound.setVolume(.5);
         this.sounds = []; // arreglo para almacenar los sonidos cargados
         this.currentSound = null;
     }
@@ -18,22 +20,27 @@ export class audioManager {
 
     playSound(router) {
         this.audioLoader.load(router, (buffer) => {
-            const sound = new THREE.Audio(this.listener);
-            sound.setBuffer(buffer);
-            sound.setVolume(0.5);
-            sound.isPlaying = false;
-            sound.onEnded = () => {
-                sound.isPlaying = false;
+            this.sound.setBuffer(buffer);
+
+            this.sound.isPlaying = false;
+            this.sound.onEnded = () => {
+                this.sound.isPlaying = false;
             };
-            if (!sound.isPlaying) {
+            if (!this.sound.isPlaying) {
                 if (this.currentSound) {
                     this.currentSound.stop(); // detener el sonido actual
                 }
-                sound.play();
-                sound.isPlaying = true;
-                this.currentSound = sound; // almacenar el nuevo sonido actual
+                this.sound.play();
+                this.sound.isPlaying = true;
+                this.currentSound = this.sound; // almacenar el nuevo sonido actual
             }
         });
+    }
+    volumen(cantidad) {
+
+        var value = cantidad;
+        var volume = value / 100; // Convertir el valor del slider a un rango de volumen adecuado
+        this.sound.setVolume(volume);
     }
 
     stopCurrentSound() {

@@ -3,7 +3,9 @@ import {
 } from './platform.js';
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
 const enemySound = './assets/music/moai.wav';
-
+import {
+  audioManager
+} from './audioManager.js';
 
 export class enemy extends platform {
   constructor(scene, fbxMesh, geometry, x, y, z) {
@@ -12,7 +14,7 @@ export class enemy extends platform {
     this.velocidadAproximacion = 0.15; // Velocidad a la que el cubo se acerca al personaje
     this.velocidadAlejamiento = 0.05; // Velocidad a la que el cubo se aleja del personaje
     this.persiguiendo = false; // Bandera que indica si el cubo está persiguiendo al personaje
-
+    this.enemyAudio = new audioManager();
   }
 
   update() {
@@ -31,7 +33,7 @@ export class enemy extends platform {
           this.mesh.position.add(direccion.multiplyScalar(this.velocidadAproximacion));
 
         } else {
-          this.soundEnemy(enemySound);
+          this.enemyAudio.playSound(enemySound);
 
 
           player1.damagelife();
@@ -52,7 +54,7 @@ export class enemy extends platform {
           var direccion = new THREE.Vector3().subVectors(player2.getPosition(), this.mesh.position).normalize();
           this.mesh.position.add(direccion.multiplyScalar(this.velocidadAproximacion));
         } else {
-          this.soundEnemy(enemySound);
+          this.enemyAudio.playSound(enemySound);
 
           player2.damagelife();
           this.persiguiendo = true;
@@ -67,25 +69,7 @@ export class enemy extends platform {
       }
     }
   }
-  soundEnemy(router) {
 
-    const audioLoader = new THREE.AudioLoader();
-    audioLoader.load(router, function (buffer) {
-      const sound = new THREE.Audio(listener);
-      sound.setBuffer(buffer);
-      sound.setVolume(0.5);
-      sound.isPlaying = false; // Agrega esta línea
-      sound.onEnded = function () { // Agrega esta función
-        this.isPlaying = false;
-      };
-      if (!sound.isPlaying) {
-        sound.play();
-        sound.isPlaying = true;
-      }
-    });
-    const listener = new THREE.AudioListener();
-    this.scene.add(listener);
-  }
 
 
 

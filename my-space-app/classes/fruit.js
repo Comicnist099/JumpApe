@@ -3,13 +3,16 @@ import {
 } from './platform.js';
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
 
-
+import {
+    audioManager
+} from './audioManager.js';
 export class fruit extends platform {
     constructor(scene, fbxMesh, geometry, x, y, z, typefruitSound, typefruit) {
         super(scene, fbxMesh, geometry, x, y, z);
         this.puntos = 100;
         this.typefruitSound = typefruitSound;
         this.typeFruit = typefruit;
+        this.fruitAudio = new audioManager();
         this.boxCollider = new THREE.Box3();
         this.mesh.geometry.computeBoundingBox();
         this.boxCollider.setFromObject(this.mesh);
@@ -68,7 +71,7 @@ export class fruit extends platform {
                         break;
                 }
                 this.scene.remove(this.mesh);
-                this.soundfruit(this.typefruitSound);
+                this.fruitAudio.playSound(this.typefruitSound);
                 player1.puntos = player1.puntos + this.puntos;
                 // Salir del bucle si hay una colisión                }
             }
@@ -76,25 +79,6 @@ export class fruit extends platform {
 
     }
 
-    soundfruit(router) {
-
-        const audioLoader = new THREE.AudioLoader();
-        audioLoader.load(router, function (buffer) {
-            const sound = new THREE.Audio(listener);
-            sound.setBuffer(buffer);
-            sound.setVolume(0.5);
-            sound.isPlaying = false; // Agrega esta línea
-            sound.onEnded = function () { // Agrega esta función
-                this.isPlaying = false;
-            };
-            if (!sound.isPlaying) {
-                sound.play();
-                sound.isPlaying = true;
-            }
-        });
-        const listener = new THREE.AudioListener();
-        this.scene.add(listener);
-    }
 
     update() {
         const angle = 0.1; // El ángulo de rotación por frame

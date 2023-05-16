@@ -5,7 +5,7 @@ import {
 const jumpSound = './assets/music/jump.wav';
 const wallSound = './assets/music/walljump.wav';
 const upSound = './assets/music/escalera.mp3';
-const player1Audio = new audioManager();
+
 
 
 var notbucle = true;
@@ -30,7 +30,7 @@ export class players {
         this.rotation = -0.5;
         this.right = false;
         this.left = false;
-
+        this.player1Audio = new audioManager();
         this.life = 3;
 
         this.puntos = 0;
@@ -44,25 +44,7 @@ export class players {
 
         this.animations = animations;
     }
-    soundPlayer(router) {
 
-        const audioLoader = new THREE.AudioLoader();
-        audioLoader.load(router, function (buffer) {
-            const sound = new THREE.Audio(listener);
-            sound.setBuffer(buffer);
-            sound.setVolume(0.5);
-            sound.isPlaying = false; // Agrega esta línea
-            sound.onEnded = function () { // Agrega esta función
-                this.isPlaying = false;
-            };
-            if (!sound.isPlaying) {
-                sound.play();
-                sound.isPlaying = true;
-            }
-        });
-        const listener = new THREE.AudioListener();
-        this.scene.add(listener);
-    }
 
     getAnimations() {
         return this.animations;
@@ -146,15 +128,6 @@ export class players {
                 this.veces = 1;
             }
         }
-
-
-        /*      // Actualización de la velocidad en y
-        camera.position.copy(this.mesh.position);
-        camera.position.add(new THREE.Vector3(10, 0, 0));
-        camera.lookAt(this.mesh.position); */
-
-
-        // Actualización de la posición en y
         if (Key.isDown(JUMP)) {
 
             this.PressJump = true;
@@ -162,14 +135,14 @@ export class players {
             this.veces = 0;
             this.yAcceleration = 10;
             if (this.touchFloor)
-                player1Audio.playSound(jumpSound);
+                this.player1Audio.playSound(jumpSound);
 
             if (this.touchWall) {
                 notbucle = false;
             }
 
             if (!this.touchWall && notbucle == false) {
-                player1Audio.playSound(wallSound);
+                this.player1Audio.playSound(wallSound);
                 notbucle = true;
             }
 

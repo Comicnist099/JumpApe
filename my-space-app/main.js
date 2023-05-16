@@ -1,4 +1,5 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js';
+
 import {
     platform
 } from './classes/platform.js';
@@ -113,6 +114,12 @@ const mangoSound = './assets/music/mango.wav';
 const cocoSound = './assets/music/coco.wav';
 
 var consolehtml = document.getElementById("console");
+var PlayerLife = document.getElementById("PlayerLife");
+var PlayerLife2 = document.getElementById("PlayerLife2");
+var PlayerPhoto = document.getElementById("PlayerPhoto");
+var PlayerPhoto2 = document.getElementById("PlayerPhoto2");
+var PauseHud = document.querySelectorAll(".PauseHud");
+
 
 // Obtener la cadena de búsqueda de la URL
 const queryString = window.location.search;
@@ -125,17 +132,26 @@ const playersUrl = urlParams.get('players');
 const escenarioUrl = urlParams.get('escenario');
 
 init();
+const listener = new THREE.AudioListener();
+
+const sound = new THREE.Audio(listener);
 
 const audioLoader = new THREE.AudioLoader();
 audioLoader.load('./assets/music/jungle.wav', function (buffer) {
-    const sound = new THREE.Audio(listener);
     sound.setBuffer(buffer);
     sound.setLoop(true);
     sound.setVolume(0.5);
     sound.play();
 });
-const listener = new THREE.AudioListener();
 camera.add(listener);
+
+// Función que se ejecuta cuando cambia el valor del slider
+/* function handleSliderChange(event) {
+    var value = event.target.value;
+    var volume = value / 100; // Convertir el valor del slider a un rango de volumen adecuado
+    sound.setVolume(volume);
+} */
+
 if (playersUrl == 2) {
     loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
         var animations = [];
@@ -176,6 +192,7 @@ if (playersUrl == 2) {
         console.error('Error al cargar el modelo FBX:', error);
     });
 }
+
 loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
     var animations = [];
     MonkeyFBX = fbx;
@@ -385,6 +402,28 @@ function CargadoModelo(path, type, Sx, Sy, Sz, Px, Py, Pz) {
     });
 
 }
+var slider = document.getElementById("slider_musica");
+slider.addEventListener("input", handleSliderChangeMusic);
+var slider2 = document.getElementById("slider_SFX");
+slider2.addEventListener("input", handleSliderChangeSFX);
+
+
+function handleSliderChangeMusic(event) {
+    let value = event.target.value;
+    var volume = value / 100; // Convertir el valor del slider a un rango de volumen adecuado
+    sound.setVolume(volume);
+}
+
+function handleSliderChangeSFX(event) {
+    let value = event.target.value;
+    Enemys[0].enemyAudio.volumen(value);
+    for (let y = 0; y < groupplayers.length; y++) {
+        groupplayers[y].player1Audio.volumen(value);
+    }
+    for (let y = 0; y < powers.length; y++) {
+        powers[y].fruitAudio.volumen(value);
+    }
+}
 
 function init() {
     container = document.createElement('div');
@@ -455,7 +494,11 @@ function init() {
         renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
     }
-
+    /*   let el = document.createElement('div');
+      el.innerHTML = "<h1>HOLA</h1>";
+      let obj = new CSS3DObject(el);
+      obj.position.set(0, 0, 0);
+      scene.add(obj); */
 }
 
 function onWindowResize() {
@@ -497,7 +540,9 @@ function animate() {
     if (!paused) {
         TWEEN.update(); // Log de la posición actual del objeto
 
-
+        for (var i = 0; i < PauseHud.length; i++) {
+            PauseHud[i].style.display = "none";
+        }
         if (cargadoModel) {
 
             for (let y = 0; y < powers.length; y++) {
@@ -537,10 +582,13 @@ function animate() {
             if (playersUrl == 2)
                 mixer2.update(0.016);
 
+
             camera.position.copy(player1.getPosition());
             camera.position.add(new THREE.Vector3(10, 2, 0));
             camera.lookAt(player1.getPosition());
             player1.input(Key.SPACE, Key.A, Key.D);
+
+
 
             if (playersUrl == 2) {
                 camera2.position.copy(player2.getPosition());
@@ -550,18 +598,26 @@ function animate() {
 
             }
 
-
-
-
-
-
-
-
-
-            consolehtml.innerHTML = "Posición del personaje:" + "<br>X:" + player1.getPositionX() + "  Y:" + player1.getPositionY() + "  Z:" + player1.getPositionZ() + "<br>Piso:" + player1.touchFloor + "<br>Wall:" + player1.touchWall + "<br>sidewall:" + player1.touchFloorWall + "<br>Life: " + player1.life + "<br>Deltatime: " + player1.deltatime;
+            if (playersUrl == 1) {
+                //consolehtml.innerHTML = "Posición del personaje:" + "<br>X:" + player1.getPositionX() + "  Y:" + player1.getPositionY() + "  Z:" + player1.getPositionZ() + "<br>Piso:" + player1.touchFloor + "<br>Wall:" + player1.touchWall + "<br>sidewall:" + player1.touchFloorWall + "<br>Life: " + player1.life + "<br>Deltatime: " + player1.deltatime;
+                PlayerLife.innerHTML = "PLAYER 1" + "<br>Vidas: " + player1.life + "<br>Score: " + player1.puntos;
+                PlayerPhoto.src = "./resources/chango_feliz.png"
+                PlayerPhoto2.style.display = "none";
+            } else if (playersUrl == 2) {
+                //consolehtml.innerHTML = "Posición del personaje:" + "<br>X:" + player1.getPositionX() + "  Y:" + player1.getPositionY() + "  Z:" + player1.getPositionZ() + "<br>Piso:" + player1.touchFloor + "<br>Wall:" + player1.touchWall + "<br>sidewall:" + player1.touchFloorWall + "<br>Life: " + player1.life + "<br>Deltatime: " + player1.deltatime;
+                PlayerLife.innerHTML = "PLAYER 1" + "<br>Vidas: " + player1.life + "<br>Score: " + player1.puntos;
+                PlayerPhoto.src = "./resources/chango_feliz.png"
+                PlayerLife2.innerHTML = "PLAYER 2" + "<br>Vidas: " + player2.life + "<br>Score: " + player2.puntos;
+                PlayerPhoto2.src = "./resources/chango_feliz.png"
+            }
 
         }
+    } else {
+        for (var i = 0; i < PauseHud.length; i++) {
+            PauseHud[i].style.display = "flex";
+        }
     }
+
     // Llamada a la función para el siguiente frame de animación
     requestAnimationFrame(animate);
     render();

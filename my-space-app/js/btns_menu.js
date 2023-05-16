@@ -1,3 +1,6 @@
+document.querySelector('.puntuaciones').style.display = "none";
+
+
 document.getElementById('button1').addEventListener("click", function () {
 	document.querySelector('.escenarios').style.display = "block";
 }); //boton jugar
@@ -73,7 +76,8 @@ document.getElementById('button6').addEventListener("click", function () {
 
 var players = 0;
 var escenario = 0;
-
+var dificultad = 0;
+//slider_musica
 
 function manejarPlayer(btn) {
 	if (btn.id === "button1Player") {
@@ -92,26 +96,31 @@ function manejarEsc(btn) {
 		escenario = 3;
 	}
 }
+
+document.getElementById("button1Player").onclick = function () {
+	manejarPlayer(this);
+
+	var url = "game.html?players=" + players + "&escenario=" + escenario;
+
+	window.location.href = url;
+}
+
+document.getElementById("button2Player").onclick = function () {
+	manejarPlayer(this);
+
+	var url = "game.html?players=" + players + "&escenario=" + escenario;
+
+	window.location.href = url;
+}
+
 document.getElementById("button1Esc").onclick = function () {
 	manejarEsc(this);
-
-
-	var url = "game.html?players=" + players + "&escenario=" + escenario;
-
-	window.location.href = url;
 };
+
 document.getElementById("button2Esc").onclick = function () {
 	manejarEsc(this);
-
-	var url = "game.html?players=" + players + "&escenario=" + escenario;
-
-	window.location.href = url;
 };
+
 document.getElementById("button3Esc").onclick = function () {
 	manejarEsc(this);
-
-
-	var url = "game.html?players=" + players + "&escenario=" + escenario;
-
-	window.location.href = url;
 };
