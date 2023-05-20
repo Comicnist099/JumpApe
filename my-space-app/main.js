@@ -34,19 +34,35 @@ WALLS:  D=WALLDOWN S=WALLSIDE U=WALLUP
 PLATFORM: P=PLATFORM
 */
 const mapTile = [
-    "P.PWP.D",
-    "......S",
-    ".PW...S",
-    ".P....S",
-    "......U",
-    "....W.."
+    ".UUUUUUUUUUUUUUUUUUUUUUUU",
+    "S.......DDD.............S",
+    "SDDDDDD.SSS.PPPPPPPPPP. S",
+    "SSSSSSS.SSS.....PPP...P.S",
+    "SUSSSSU.SSS........W....S",
+    "SSSUSU..USS.PPPPPP...PPPS",
+    "SSS.U.PP.SS.............S",
+    "SUS......SSS....PP......S",
+    "S.UW.W...UUU............S",
+    "S......W....DPP.WPP..P..S",
+    "SPWPPPP..W..SP..........S",
+    "S.......W...SPWWWWWWW.P.S",
+    "S....W......S.P.........S",
+    "S..W.,....S.S....WWWWWW.S",
+    "S.....W...SDS.P.........S",
+    "S..W...W..SSSPPP.P..WWWd.S",
+    "SP........SSS...........S",
+    "S...W..WPPUSS......P....S",
+    "SP.P..W....UUPPPP.......S",
+    "S.......................S",
+    ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
+
 ];
 
 const mapElement = [
     "B......",
-    "C....B.",
-    "E....C.",
-    ".....M.",
+    ".BBBBBBB...B.",
+    "E......",
+    ".......",
     ".......",
     "......."
 ];
@@ -183,7 +199,7 @@ if (playersUrl == 2) {
             }
         });
 
-        player2 = new players(0, 5, 0, scene, MonkeyFBX, animations);
+        player2 = new players(0, 10, 0, scene, MonkeyFBX, animations);
         groupplayers.push(player2);
         scene.add(player2.getMesh());
 
@@ -223,7 +239,7 @@ loader.load('./assets/models/Monkey/Idle.fbx', (fbx) => {
         }
     });
 
-    player1 = new players(0, 5, 0, scene, MonkeyFBX, animations)
+    player1 = new players(0, 10, 0, scene, MonkeyFBX, animations)
     groupplayers.push(player1);
     scene.add(player1.getMesh());
     cargadoModel = true;
@@ -599,7 +615,7 @@ function animate() {
             }
 
             if (playersUrl == 1) {
-                //consolehtml.innerHTML = "Posición del personaje:" + "<br>X:" + player1.getPositionX() + "  Y:" + player1.getPositionY() + "  Z:" + player1.getPositionZ() + "<br>Piso:" + player1.touchFloor + "<br>Wall:" + player1.touchWall + "<br>sidewall:" + player1.touchFloorWall + "<br>Life: " + player1.life + "<br>Deltatime: " + player1.deltatime;
+                consolehtml.innerHTML = "Posición del personaje:" + "<br>X:" + player1.getPositionX() + "  Y:" + player1.getPositionY() + "  Z:" + player1.getPositionZ() + "<br>Piso:" + player1.touchFloor + "<br>Wall:" + player1.touchWall + "<br>sidewall:" + player1.touchFloorWall + "<br>Life: " + player1.life + "<br>Deltatime: " + player1.deltatime;
                 PlayerLife.innerHTML = "PLAYER 1" + "<br>Vidas: " + player1.life + "<br>Score: " + player1.puntos;
                 PlayerPhoto.src = "./resources/chango_feliz.png"
                 PlayerPhoto2.style.display = "none";

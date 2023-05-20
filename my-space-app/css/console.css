@@ -1,3 +1,15 @@
+ p {
+  position: fixed;
+    top: 20%;
+    left:0%;
+    width: 70%;
+    height: 70%;
+
+    color:green;
+    
+    font-size: 1.5em; /* Cambia este valor según tu preferencia */
+    line-height: 1.5; /* Cambia este valor según tu preferencia */
+  }
 
 #hud p {
   position: fixed;

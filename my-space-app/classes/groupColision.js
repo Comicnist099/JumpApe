@@ -79,7 +79,7 @@ export class groupColision {
                         }
                     } else if (player.mesh.position.y < Py2) {
                         if (down)
-                            player.mesh.position.setY(Py2 - .8);
+                            player.mesh.position.setY(Py2 - .9);
                     } else if (player.mesh.position.z > Pz1) {
                         if (side) {
                             console.log("tocado Wall");

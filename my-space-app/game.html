@@ -10,7 +10,7 @@
 		</style>
 	</head>
 	<body>	
-
+<p id=console></p>
 		<div id=hud>
 			<img id=PlayerPhoto>
 			<p id=PlayerLife></p> 
@@ -20,7 +20,7 @@
 			<p id=PlayerLife2></p> 
 		</div>
 
-		<div class="PauseHud">
+<!-- 		<div class="PauseHud">
 			<h1> PAUSA </h1>
 			<div class="musica">
 				<h3> MUSICA </h3>
@@ -63,10 +63,24 @@
 			<div class="musica">
 				<img id="btn_regresar" class="btn_regresar" src="./resources/boton_regresar.png " alt="atras " width="180px" height="70px">
 </div>
+		</div> -->
+
+		<div class="PauseHud">
+			<h1>RESULTADOS</h1>
+			<h4 id="playerWin">PLAYER 1</h4>
+			<h4 id="playerPoints">Puntuación: 1000</h4>			
+			<div class="musica">
+			
+	
+
+			<div class="musica">
+				<img id="btn_regresar" class="btn_regresar" src="./resources/boton_regresar.png " alt="atras " width="180px" height="70px">
+			</div>
 		</div>
+		<script src="./bd/firebase.js" type="module"></script>
         <script src="js/keys.js"></script>
 		<script src="js/tween.js"></script>
-		<script src="./main.js" type="module">
+		<script src="./main.js" type="module"></script>
 		<script src="js/input.js"></script>
 		<script src="js/cannon.js"></script>
 		<script src="js/detector.js"></script>
