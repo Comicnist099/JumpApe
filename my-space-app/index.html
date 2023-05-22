@@ -14,7 +14,7 @@
 				<video src="" autoplay muted loop></video>
 			</div>
 			
-			<div class="containerLOGO">p
+			<div class="containerLOGO">
 				<img class="LOGO" src="./resources/LOGO_SIN_BOTON.png" alt="alternatetext">
 			</div>
 
@@ -48,23 +48,14 @@
 
 		<div class="puntuaciones">
 			<h1>PUNTUACIONES</h1>
-			<table class="">
-				<tr>
-					<th>Usuario</th>
-					<th>Puntaje</th>
-				</tr>
-				<tr>
-					<td>La Minna</td>
-					<td>100 puntos</td>
-				</tr>
-
-				<tr>
-					<td>La Ale</td>
-					<td>100 puntos</td>
-				</tr>
+			<table id="tablaPuntuaciones" class="">
+			  <tr>
+				<th>Usuario</th>
+				<th>Puntaje</th>
+			  </tr>
 			</table>
-			<img id="btn_regresar_puntuacion" class="btn_regresar" src="./resources/boton_regresar.png " alt="atras " width="180px" height="70px">
-		</div>
+			<img id="btn_regresar_puntuacion" class="btn_regresar" src="./resources/boton_regresar.png" alt="atras" width="180px" height="70px">
+		  </div>
 		</div>
 		
 		<div class="escenarios">
@@ -75,53 +66,26 @@
 			<a id="button3Esc" class="dif1" href="#"> <img src="./resources/boton_modo_construccion.png " alt="Jugar " width="300" height="110"></a>
 		</div>
 
-		<div class="Ajustes">
+		<div class="Ajustes"><br>
 			<h1> AJUSTES </h1>
+			<h2>MODOS</h2>
 			<div class="musica">
-				<h3> MUSICA </h3>
-				<div>
-					<div class="slider-iconos">
-						<div class="iconos">
-							<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
-								<path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
-							</svg>
-							<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-								<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-							</svg>
-						</div>
-						<div class="slidecontainer">
-							<input type="range" min="1" max="100" value="50" class="slider" id="slider_musica">
-						</div>
-					</div>
+				<img id="Modo1" src="./resources/boton_modo_normal.png" alt="atras " width="110px" height="35px">
+				<img id="Modo2" src="./resources/boton_modo_bananas.png" alt="atras " width="110px" height="35px">
 				</div>
-			</div>
-
-			
-
-			<div class="efectos">
-				<h3> EFECTOS </h3>
-				<div>
-					<div class="slider-iconos">
-						<div class="iconos">
-							<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-dash" viewBox="0 0 16 16">
-								<path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/>
-							</svg>
-							<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-								<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-							</svg>
-						</div>
-						<div class="slidecontainer">
-							<input type="range" min="1" max="100" value="50" class="slider" id="slider_efectos">
-						</div>
-					</div>
+				<h2>Dificultad</h2>
+			<div class="musica">
+				<img id="Dificultad1" src="./resources/boton_modo_normal.png" alt="atras " width="110px" height="35px">
+				<img id="Dificultad2" src="./resources/boton_modo_hardcore.png" alt="atras " width="110px" height="35px">
 				</div>
-			</div>
+				<div class="musica">
 			<img id="prueba" src="./resources/boton_regresar.png" alt="atras " width="180px" height="70px">
 		</div>
 
 		<div class="creditos">
 			<div class="close" id="button6">X</div>
 		</div>
+		<script  type="module" src="./js/puntuaciones.js"></script>
 
 		<script type="text/javascript" src="./js/btns_menu.js"></script>
 	</body>

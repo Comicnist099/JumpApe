@@ -76,7 +76,8 @@ document.getElementById('button6').addEventListener("click", function () {
 
 var players = 0;
 var escenario = 0;
-var dificultad = 0;
+var dificultad = 1;
+var modo = 1;
 //slider_musica
 
 function manejarPlayer(btn) {
@@ -97,10 +98,44 @@ function manejarEsc(btn) {
 	}
 }
 
+function manejarDificultad(btn) {
+	if (btn.id === "Dificultad1") {
+		dificultad = 1;
+	} else if (btn.id === "Dificultad2") {
+		dificultad = 2;
+	}
+}
+
+function manejarModo(btn) {
+	if (btn.id === "Modo1") {
+		modo = 1;
+	} else if (btn.id === "Modo2") {
+		modo = 2;
+	}
+}
+
+
+
+document.getElementById("Modo1").onclick = function () {
+	manejarModo(this);
+};
+
+document.getElementById("Modo2").onclick = function () {
+	manejarModo(this);
+};
+
+document.getElementById("Dificultad1").onclick = function () {
+	manejarDificultad(this);
+};
+
+document.getElementById("Dificultad2").onclick = function () {
+	manejarDificultad(this);
+};
+
 document.getElementById("button1Player").onclick = function () {
 	manejarPlayer(this);
 
-	var url = "game.html?players=" + players + "&escenario=" + escenario;
+	var url = "game.html?players=" + players + "&escenario=" + escenario + "&dificultad=" + dificultad + "&modo=" + modo;
 
 	window.location.href = url;
 }
@@ -108,10 +143,13 @@ document.getElementById("button1Player").onclick = function () {
 document.getElementById("button2Player").onclick = function () {
 	manejarPlayer(this);
 
-	var url = "game.html?players=" + players + "&escenario=" + escenario;
+	var url = "game.html?players=" + players + "&escenario=" + escenario + "&dificultad=" + dificultad + "&modo=" + modo;
 
 	window.location.href = url;
 }
+
+
+
 
 document.getElementById("button1Esc").onclick = function () {
 	manejarEsc(this);

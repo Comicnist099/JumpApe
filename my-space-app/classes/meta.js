@@ -6,12 +6,11 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.118/build/three.mod
 import {
     audioManager
 } from './audioManager.js';
-export class fruit extends platform {
-    constructor(scene, fbxMesh, geometry, x, y, z, typefruitSound, typefruit) {
+export class meta extends platform {
+    constructor(scene, fbxMesh, geometry, x, y, z) {
         super(scene, fbxMesh, geometry, x, y, z);
         this.puntos = 100;
-        this.typefruitSound = typefruitSound;
-        this.typeFruit = typefruit;
+
         this.fruitAudio = new audioManager();
         this.boxCollider = new THREE.Box3();
         this.mesh.geometry.computeBoundingBox();
@@ -36,7 +35,7 @@ export class fruit extends platform {
         }, 5000); // Esperar 3 segundos antes de restaurar el valor original
     }
 
-    colision(player1, arrayElement) {
+    colision(player1, player2, url, arrayElement) {
 
         var Jy1 = player1.mesh.position.y
         var Jy2 = player1.mesh.scale.y + player1.mesh.position.y;
@@ -59,19 +58,15 @@ export class fruit extends platform {
                 if (indexToRemove !== -1) {
                     arrayElement.splice(indexToRemove, 1);
                 }
-                switch (this.typeFruit) {
-                    case 'banana':
-                        this.effectSpeed(player1);
-                        break;
-                    case 'coco':
-                        this.effectLife(player1);
-                        break;
-                    case 'mango':
-                        this.effectStar(player1);
-                        break;
-                }
+                if (url == 2)
+                    player2.life = 0;
+                else
+                    player1.life = 0;
+
+
+
                 this.scene.remove(this.mesh);
-                this.fruitAudio.playSound(this.typefruitSound);
+
                 player1.puntos = player1.puntos + this.puntos;
                 // Salir del bucle si hay una colisión                }
             }

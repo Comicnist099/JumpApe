@@ -70,7 +70,7 @@ export class groupColision {
                 if (Jy2 < Py1 + 1 && Jy1 > Py2 - .8 && Jz2 > Pz1 - .79 && Jz1 < Pz2 + .8) {
                     if (player.mesh.position.y > Py1) {
                         if (up) {
-                            console.log("Plataforma");
+
                             player.touchFloor = true;
                             player.touchFloorWall = true;
                             player.ySpeed = 0;
@@ -82,7 +82,7 @@ export class groupColision {
                             player.mesh.position.setY(Py2 - .9);
                     } else if (player.mesh.position.z > Pz1) {
                         if (side) {
-                            console.log("tocado Wall");
+
                             player.touchWall = true;
                             player.ySpeed = 0;
                             player.velocity.y = 0;
@@ -91,7 +91,7 @@ export class groupColision {
 
                     } else if (player.mesh.position.z < Pz2) {
                         if (side) {
-                            console.log("tocado Wall");
+
                             player.touchWall = true;
                             player.ySpeed = 0;
                             player.velocity.y = 0;

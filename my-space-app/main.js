@@ -13,6 +13,9 @@ import {
     fruit
 } from './classes/fruit.js';
 import {
+    meta
+} from './classes/meta.js';
+import {
     enemy
 } from './classes/enemy.js';
 import {
@@ -22,9 +25,65 @@ import {
 import {
     FBXLoader
 } from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/FBXLoader.js';
-/* import {GLTFLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/GLTFLoader.js';
-import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.118/examples/jsm/controls/OrbitControls.js';
- */
+
+import {
+    database
+} from "./bd/firebase.js";
+import {
+    ref,
+    push,
+    set
+} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+var WinHud = document.querySelectorAll(".WinHud");
+var consolehtml = document.getElementById("console");
+var PlayerLife = document.getElementById("PlayerLife");
+var PlayerLife2 = document.getElementById("PlayerLife2");
+var PlayerPhoto = document.getElementById("PlayerPhoto");
+var PlayerPhoto2 = document.getElementById("PlayerPhoto2");
+var PauseHud = document.querySelectorAll(".PauseHud");
+var playerWin = document.getElementById("playerWin");
+var playerPoints = document.getElementById("playerPoints");
+var finish = false;
+
+
+
+function guardarDatos(nombre, puntos) {
+    const puntuacionesRef = ref(database, "puntuaciones");
+    const nuevaPuntuacionRef = push(puntuacionesRef);
+
+    // Utilizar el método set que devuelve una promesa
+    set(nuevaPuntuacionRef, {
+            nombre: nombre,
+            puntos: puntos
+        })
+        .then(() => {
+            // Operación de guardado completada, redirigir al usuario
+            var url = "index.html";
+            window.location.href = url;
+        })
+        .catch((error) => {
+            // Manejar cualquier error que pueda ocurrir durante el guardado
+            console.error("Error al guardar los datos:", error);
+        });
+}
+
+const botonGuardar = document.getElementById("btn_salir");
+
+// Agregar un event listener al botón
+botonGuardar.addEventListener("click", function () {
+    // Llamar a la función guardarPuntuacion con los datos adecuados
+    let namePlayer = document.getElementById("namePlayer");
+    let NamePlayer = namePlayer.value;
+    let PointPlayer = playerPoints.textContent;
+    console.log(NamePlayer + " " + PointPlayer);
+
+    guardarDatos(NamePlayer, PointPlayer);
+
+
+});
+
+
 
 const groupColisions = new groupColision();
 
@@ -33,39 +92,196 @@ FRUTAS: B=BANANA,C=COCO,M=MANGO
 WALLS:  D=WALLDOWN S=WALLSIDE U=WALLUP
 PLATFORM: P=PLATFORM
 */
-const mapTile = [
-    ".UUUUUUUUUUUUUUUUUUUUUUUU",
-    "S.......DDD.............S",
-    "SDDDDDD.SSS.PPPPPPPPPP. S",
-    "SSSSSSS.SSS.....PPP...P.S",
-    "SUSSSSU.SSS........W....S",
-    "SSSUSU..USS.PPPPPP...PPPS",
-    "SSS.U.PP.SS.............S",
-    "SUS......SSS....PP......S",
-    "S.UW.W...UUU............S",
-    "S......W....DPP.WPP..P..S",
-    "SPWPPPP..W..SP..........S",
-    "S.......W...SPWWWWWWW.P.S",
-    "S....W......S.P.........S",
-    "S..W.,....S.S....WWWWWW.S",
-    "S.....W...SDS.P.........S",
-    "S..W...W..SSSPPP.P..WWWd.S",
-    "SP........SSS...........S",
-    "S...W..WPPUSS......P....S",
-    "SP.P..W....UUPPPP.......S",
-    "S.......................S",
-    ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
 
-];
+// Obtener la cadena de búsqueda de la URL
+const queryString = window.location.search;
 
-const mapElement = [
-    "B......",
-    ".BBBBBBB...B.",
-    "E......",
-    ".......",
-    ".......",
-    "......."
-];
+// Crear un objeto URLSearchParams a partir de la cadena de búsqueda
+const urlParams = new URLSearchParams(queryString);
+
+// Obtener el valor del parámetro 'variable1'
+const playersUrl = urlParams.get('players');
+const escenarioUrl = urlParams.get('escenario');
+const dificultadUrl = urlParams.get('dificultad');
+const modoUrl = urlParams.get('modo');
+
+var mapTile = [];
+let mapElement = [];
+
+
+if (dificultadUrl == 1) {
+
+    mapTile = [
+        ".UUUUUUUUUUUUUUUUUUUUUUUU",
+        "S.......DDD.............S",
+        "SDDDDDD.SSS............ S",
+        "SSSSSSS.SSS.....PPP...P.S",
+        "SUSSSSU.SSS........W....S",
+        "SSSUSU..USS.PP.......PPPS",
+        "SSS.U.PP.SS.............S",
+        "SUS......SSS....PP......S",
+        "S.UW.W...UUU............S",
+        "S......W....DPP.WPP..P..S",
+        "SPWPPPP..W..SP..........S",
+        "S.......W...SPWWW.....P.S",
+        "S.W..W......S.P.........S",
+        "S..W....W.S.S....WWWWWW.S",
+        "S.....W...SDS.P.........S",
+        "S..W...W..SSSPPP.P..WWWd.S",
+        "SP........SSS...........S",
+        "S...W..WPPUSS......P....S",
+        "SP.P..W....UUPPPP.......S",
+        "S.......................S",
+        ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
+
+    ];
+    if (modoUrl == 1) {
+        mapElement = [
+            ".UUUUUUUUUUUUUUUUUUUUUUUU",
+            "SE..B...DDD.......G.....S",
+            "SDDDDDD.SSS.............S",
+            "SSSSSSS.SSS.....PPP...P.S",
+            "SUSSSSU.SSS........W....S",
+            "SSSUSU..USS.PP...B...PPPS",
+            "SSS.U.PPCSS....C........S",
+            "SUS......SSS....PP......S",
+            "S.UW.W...UUU.......B....S",
+            "S...B..W....DPP.WPP..P..S",
+            "SPWPPPP..W..SP....C.....S",
+            "S...C...W...SPWWW.....P.S",
+            "S.W..W..M...S.P.........S",
+            "S..W....W.S.S....WWWWWW.S",
+            "S.....W...SDS.P.........S",
+            "S..W...W..SSSPPP.P..WWWd.S",
+            "SP....C...SSS...C.......S",
+            "S...W..WPPUSS......P....S",
+            "SP.P..W....UUPPPP...B...S",
+            "S..........B............S",
+            ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
+
+
+        ];
+    } else {
+        mapElement = [
+            ".UUUUUUUUUUUUUUUUUUUUUUUU",
+            "S...BC..DDD.......G.....S",
+            "SDDDDDD.SSS.............S",
+            "SSSSSSS.SSS.....PPP...P.S",
+            "SUSSSSU.SSS........W....S",
+            "SSSUSU..USS.PP...B...PPPS",
+            "SSS.U.PPCSS....C........S",
+            "SUS......SSS....PP......S",
+            "S.UW.W...UUU.......B....S",
+            "S...B..W....DPP.WPP..P..S",
+            "SPWPPPP..W..SP....C.....S",
+            "S...C...W...SPWWW.....P.S",
+            "S.W..W..M...S.P.........S",
+            "S..W....W.S.S....WWWWWW.S",
+            "S.....W...SDS.P.........S",
+            "S..W...W..SSSPPP.P..WWWd.S",
+            "SP....C...SSS...C.......S",
+            "S...W..WPPUSS......P....S",
+            "SP.P..W....UUPPPP...B...S",
+            "S..........B............S",
+            ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
+
+
+        ];
+        for (var i = 0; i < mapElement.length; i++) {
+            mapElement[i] = mapElement[i].replace(/[CME]/g, 'B');
+        }
+
+    }
+} else if (dificultadUrl == 2) {
+
+    mapTile = [
+        ".UUUUUUUUUUUUUUUUUUUUUUUU",
+        "S.......DDD.............S",
+        "SDDDDDD.SSS.PPPPPPPPPP. S",
+        "SSSSSSS.SSS.....PPP...P.S",
+        "SUSSSSU.SSS........W....S",
+        "SSSUSU..USS.PPPPPP...PPPS",
+        "SSS.U.PP.SS.............S",
+        "SUS......SSS....PP......S",
+        "S.UW.W...UUU............S",
+        "S......W....DPP.WPP..P..S",
+        "SPWPPPP..W..SP..........S",
+        "S.......W...SPWWWWWWW.P.S",
+        "S....W......S.P.........S",
+        "S..W.,....S.S....WWWWWW.S",
+        "S.....W...SDS.P.........S",
+        "S..W...W..SSSPPP.P..WWWd.S",
+        "SP........SSS...........S",
+        "S...W..WPPUSS......P....S",
+        "SP.P..W....UUPPPP.......S",
+        "S.......................S",
+        ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
+
+    ];
+    if (modoUrl == 1) {
+
+        mapElement = [
+            ".UUUUUUUUUUUUUUUUUUUUUUUU",
+            "SE..B...DDD.......G..B..S",
+            "SDDDDDD.SSS...B.........S",
+            "SSSSSSS.SSS.....PPP...P.S",
+            "SUSSSSU.SSS........W....S",
+            "SSSUSU..USS.PP...B...PPPS",
+            "SSS.U.PPCSS....C.....B..S",
+            "SUS...B..SSS....PP......S",
+            "S.UW.W...UUU.......B....S",
+            "S...B..W....DPP.WPP..P..S",
+            "SPWPPPP..W..SP....C.....S",
+            "S...C...W...SPWWW..C..P.S",
+            "S.W..W..M...S.P.........S",
+            "S..W....W.S.S....WWWWWW.S",
+            "S.C...W...SDS.P.........S",
+            "S..W...W..SSSPPP.P..WWWd.S",
+            "SP.M..C...SSS...C....C..S",
+            "S...W..WPPUSS......P....S",
+            "SP.P..W....UUPPPP...B...S",
+            "S.....C....B............S",
+            ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
+
+
+        ];
+    } else {
+        mapElement = [
+            ".UUUUUUUUUUUUUUUUUUUUUUUU",
+            "SE..B...DDD.......G..B..S",
+            "SDDDDDDBSSS...B.........S",
+            "SSSSSSS.SSS.....PPP...P.S",
+            "SUSSSSUCSSS........W....S",
+            "SSSUSU..USS.PP...B...PPPS",
+            "SSS.U.PPCSS....C.....B..S",
+            "SUS...B..SSS....PP......S",
+            "S.UW.W...UUU.......B....S",
+            "S...B..W....DPP.WPP..P..S",
+            "SPWPPPP..W..SP....C.....S",
+            "S...C...W...SPWWW..C..P.S",
+            "S.W..W..M...S.P.........S",
+            "S..W....W.S.S....WWWWWW.S",
+            "S.C...W...SDS.P.........S",
+            "S..W...W..SSSPPP.P..WWWd.S",
+            "SP.M..C...SSS...C....C..S",
+            "S...W..WPPUSS......P....S",
+            "SP.P..W....UUPPPP...B...S",
+            "S.....C....B............S",
+            ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
+
+
+        ];
+
+        for (var i = 0; i < mapElement.length; i++) {
+            mapElement[i] = mapElement[i].replace(/[CM]/g, 'B');
+        }
+
+
+    }
+}
+
+
+
 var groupplayers = []
 // VENTANA
 var container,
@@ -107,7 +323,8 @@ var platforms = [],
     wallsUp = [],
     wallsDown = [],
     Enemys = [],
-    powers = [];
+    powers = [],
+    goal = [];
 
 
 // CARGADO DE MODELOS
@@ -122,6 +339,7 @@ const ModelSpike = './assets/models/Platforms/Spikes.fbx';
 const ModelCoco = './assets/models/Props/fruits/Coco/Coco.fbx';
 const ModelBanana = './assets/models/Props/fruits/Banana/Banana.fbx';
 const ModelMango = './assets/models/Props/fruits/Mango/Mango.fbx';
+const ModelGoal = './assets/models/Goal/goalflag.fbx';
 const ModelMoai = './assets/models/Enemy/Moai.fbx';
 
 //SOUND
@@ -129,23 +347,7 @@ const platanoSound = './assets/music/platano.wav';
 const mangoSound = './assets/music/mango.wav';
 const cocoSound = './assets/music/coco.wav';
 
-var consolehtml = document.getElementById("console");
-var PlayerLife = document.getElementById("PlayerLife");
-var PlayerLife2 = document.getElementById("PlayerLife2");
-var PlayerPhoto = document.getElementById("PlayerPhoto");
-var PlayerPhoto2 = document.getElementById("PlayerPhoto2");
-var PauseHud = document.querySelectorAll(".PauseHud");
 
-
-// Obtener la cadena de búsqueda de la URL
-const queryString = window.location.search;
-
-// Crear un objeto URLSearchParams a partir de la cadena de búsqueda
-const urlParams = new URLSearchParams(queryString);
-
-// Obtener el valor del parámetro 'variable1'
-const playersUrl = urlParams.get('players');
-const escenarioUrl = urlParams.get('escenario');
 
 init();
 const listener = new THREE.AudioListener();
@@ -268,8 +470,11 @@ for (let i = 0; i < mapElement.length; i++) {
             case "C":
                 CargadoModelo(ModelCoco, "C", .010, .010, .010, 0, posicion2.y, posicion2.z);
                 break;
+            case "G":
+                CargadoModelo(ModelGoal, "G", .010, .010, .010, 0, posicion2.y, posicion2.z);
+                break;
             case "E":
-                CargadoModelo(ModelMoai, "E", .030, .030, .030, 0, posicion.y, posicion.z);
+                CargadoModelo(ModelMoai, "E", .030, .030, .030, 0, posicion2.y, posicion2.z);
                 break;
 
             default:
@@ -307,21 +512,7 @@ for (let i = 0; i < mapTile.length; i++) {
             case "S":
                 CargadoModelo(ModelWood, "S", .015, .14, .04, 0, posicion.y + 2, posicion.z);
                 break;
-                // FRUTA BANANA
-            case "B":
-                CargadoModelo(ModelBanana, "B", .010, .010, .010, 0, posicion.y, posicion.z);
-                break;
-                // FRUTA MANGO
-            case "M":
-                CargadoModelo(ModelMango, "M", .0010, .0010, .0010, 0, posicion.y, posicion.z);
-                break;
-                // FRUTA COCO
-            case "C":
-                CargadoModelo(ModelCoco, "C", .010, .010, .010, 0, posicion.y, posicion.z);
-                break;
-            case "E":
-                CargadoModelo(ModelMoai, "E", .030, .030, .030, 0, posicion.y, posicion.z);
-                break;
+
 
             default:
                 break;
@@ -334,7 +525,7 @@ for (let i = 0; i < mapTile.length; i++) {
 var textureLoader = new THREE.TextureLoader();
 const junglaFondo = './assets/img/chango.png';
 const spaceFondo = './assets/img/space.png'
-const builtFondo = './assets/img/space.png'
+const builtFondo = './assets/img/construccion.png'
 // Carga la imagen del fondo
 
 function fondo(path) {
@@ -390,6 +581,10 @@ function CargadoModelo(path, type, Sx, Sy, Sz, Px, Py, Pz) {
             PowerMap = new fruit(scene, model, geometry, Px, Py, Pz, cocoSound, 'coco');
             powers.push(PowerMap);
 
+        } else if (type == "G") { // ///Coco
+            PowerMap = new meta(scene, model, geometry, Px, Py, Pz);
+            goal.push(PowerMap);
+
         } else if (type == "M") { // ///Mango
             PowerMap = new fruit(scene, model, geometry, Px, Py, Pz, mangoSound, 'mango');
             powers.push(PowerMap);
@@ -432,7 +627,13 @@ function handleSliderChangeMusic(event) {
 
 function handleSliderChangeSFX(event) {
     let value = event.target.value;
-    Enemys[0].enemyAudio.volumen(value);
+    var volume = value / 100;
+
+
+
+    for (let y = 0; y < Enemys.length; y++) {
+        Enemys[y].enemyAudio.volumen(value);
+    }
     for (let y = 0; y < groupplayers.length; y++) {
         groupplayers[y].player1Audio.volumen(value);
     }
@@ -442,6 +643,11 @@ function handleSliderChangeSFX(event) {
 }
 
 function init() {
+
+
+
+
+
     container = document.createElement('div');
     document.body.appendChild(container);
 
@@ -546,8 +752,16 @@ function onWindowResize() {
 
 window.addEventListener('resize', onWindowResize, false);
 
+
+var BoolOne = false;
+
 function animate() {
-    console.log(playersUrl);
+
+
+
+
+
+
 
     if (Key.isPressed(Key.P)) {
         paused = !paused;
@@ -561,16 +775,89 @@ function animate() {
         }
         if (cargadoModel) {
 
+            if (!BoolOne) {
+                if (dificultadUrl == 2) {
+                    player1.life = 1;
+                    if (playersUrl == 2)
+                        player2.life = 1;
+                } else {
+                    player1.life = 3;
+                    if (playersUrl == 2)
+                        player2.life = 3;
+                }
+                BoolOne = true;
+            }
+
+
             for (let y = 0; y < powers.length; y++) {
                 powers[y].update();
                 powers[y].colision(player1, powers);
 
             }
-            if (playersUrl == 2) {
+
+            for (let y = 0; y < goal.length; y++) {
+                goal[y].update();
+                goal[y].colision(player1, player2, playersUrl, goal);
+
+            }
+
+
+            if (playersUrl == 1) {
+                if (player1.life <= 0) {
+                    playerWin.innerHTML = "PLAYER 1"
+                    playerPoints.innerHTML = player1.puntos;
+                    finish = true;
+                    for (var i = 0; i < WinHud.length; i++) {
+                        WinHud[i].style.display = "flex";
+                    }
+                    paused = true;
+                }
+                for (let y = 0; y < Enemys.length; y++) {
+                    Enemys[y].update();
+                    Enemys[y].actualizarCubo(player1, player1);
+                }
+
+
+            } else if (playersUrl == 2) {
+
+                if (player1.life <= 0) {
+                    playerWin.innerHTML = "PLAYER 2"
+                    playerPoints.innerHTML = player2.puntos;
+                    finish = true;
+                    for (var i = 0; i < WinHud.length; i++) {
+                        WinHud[i].style.display = "flex";
+                    }
+                    paused = true;
+                } else if (player2.life <= 0) {
+                    playerWin.innerHTML = "PLAYER 1"
+                    playerPoints.innerHTML = player1.puntos;
+                    finish = true;
+                    for (var i = 0; i < WinHud.length; i++) {
+                        WinHud[i].style.display = "flex";
+                    }
+                    paused = true;
+                }
                 for (let y = 0; y < powers.length; y++) {
                     powers[y].colision(player2, powers);
                 }
+
+                for (let y = 0; y < goal.length; y++) {
+                    goal[y].update();
+                    goal[y].colision(player2, player1, playersUrl, goal);
+
+                }
+                for (let y = 0; y < Enemys.length; y++) {
+                    Enemys[y].update();
+
+                    Enemys[y].actualizarCubo(player1, player2);
+                }
+
             }
+
+
+
+
+
             groupColisions.colision(groupplayers, platforms);
             groupColisions.colisionWall(groupplayers, walls, true, true, true);
             groupColisions.colisionWall(groupplayers, wallsUp, true, false, true);
@@ -579,13 +866,8 @@ function animate() {
 
 
 
-            if (playersUrl == 2) {
-                Enemys[0].actualizarCubo(player1, player2);
-            } else {
-                Enemys[0].actualizarCubo(player1, player1);
 
-            }
-            Enemys[0].update();
+
 
 
             if (PlatfomsScena) {

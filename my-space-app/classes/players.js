@@ -31,7 +31,7 @@ export class players {
         this.right = false;
         this.left = false;
         this.player1Audio = new audioManager();
-        this.life = 3;
+        this.life = 1;
 
         this.puntos = 0;
         this.mesh = fbxModel;
@@ -282,7 +282,7 @@ export class players {
         if (this.velocity.length() > this.maxVelocity * this.deltatime) {
             this.velocity.normalize().multiplyScalar(this.maxVelocity * this.deltatime);
         }
-        console.log(this.velocity.length());
+
         this.mesh.position.add(this.velocity);
 
 

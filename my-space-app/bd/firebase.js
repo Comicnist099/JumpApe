@@ -1,6 +1,15 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import {
+  getAnalytics
+} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
+import {
+  getDatabase,
+  ref,
+  set
+} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -12,7 +21,7 @@ const firebaseConfig = {
   authDomain: "jumpape-6aa43.firebaseapp.com",
   projectId: "jumpape-6aa43",
   storageBucket: "jumpape-6aa43.appspot.com",
-  messagingSenderId: "1009071606899",
+  messagingSenderId: "100907160689s9",
   appId: "1:1009071606899:web:f3f0afccb4f8be0ce9ee06",
   measurementId: "G-FFJMMP3J7K"
 };
@@ -20,3 +29,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+const database = getDatabase();
+export {
+  database
+};

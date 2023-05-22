@@ -445,6 +445,49 @@ align-items: center;
 	right: 25px;
 	cursor: pointer;
 }
- 
+ #namePlayer{
+	font-size: 36px;
 
-  
+ }
+
+    
+.WinHud {
+	position: fixed;
+	left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+	text-align: center;
+	justify-content: center;
+	align-items: center;
+	margin-top: 150px;
+	z-index: 2;
+	height: 500px;
+	width: 325px;
+	border-radius: 20px;
+	background-image: url("../resources/tabla_fondo.png");
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center;
+	display: none;
+	flex-direction: column;
+}
+
+.WinHud h1 {
+	font-family: 'Bebas Neue', cursive;
+	color: aliceblue;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	font-size: 37px;
+}
+
+.WinHud .close {
+	font-family: 'Bebas Neue', cursive;
+	color: aliceblue;
+	font-size: 37px;
+	position: absolute;
+	top: 20px;
+	right: 25px;
+	cursor: pointer;
+}
