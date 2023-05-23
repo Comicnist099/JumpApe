@@ -11,7 +11,7 @@ export class enemy extends platform {
   constructor(scene, fbxMesh, geometry, x, y, z) {
     super(scene, fbxMesh, geometry, x, y, z);
     this.distanciaObjetivo = 2; // Distancia objetivo entre el personaje y el cubo
-    this.velocidadAproximacion = 0.15; // Velocidad a la que el cubo se acerca al personaje
+    this.velocidadAproximacion = 0.18; // Velocidad a la que el cubo se acerca al personaje
     this.velocidadAlejamiento = 0.05; // Velocidad a la que el cubo se aleja del personaje
     this.persiguiendo = false; // Bandera que indica si el cubo está persiguiendo al personaje
     this.enemyAudio = new audioManager();

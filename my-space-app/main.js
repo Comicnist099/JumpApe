@@ -92,13 +92,10 @@ FRUTAS: B=BANANA,C=COCO,M=MANGO
 WALLS:  D=WALLDOWN S=WALLSIDE U=WALLUP
 PLATFORM: P=PLATFORM
 */
-
 // Obtener la cadena de búsqueda de la URL
 const queryString = window.location.search;
-
 // Crear un objeto URLSearchParams a partir de la cadena de búsqueda
 const urlParams = new URLSearchParams(queryString);
-
 // Obtener el valor del parámetro 'variable1'
 const playersUrl = urlParams.get('players');
 const escenarioUrl = urlParams.get('escenario');
@@ -108,175 +105,392 @@ const modoUrl = urlParams.get('modo');
 var mapTile = [];
 let mapElement = [];
 
-
 if (dificultadUrl == 1) {
+    switch (escenarioUrl) {
+        case '1':
+            mapTile = [
+                ".UUUUUUUUUUUUUUUUUUUUUUUU",
+                "S.......DDD.............S",
+                "SDDDDDD.SSS............ S",
+                "SSSSSSS.SSS.....PPP...P.S",
+                "SUSSSSU.SSS........W....S",
+                "SSSUSU..USS.PP.......PPPS",
+                "SSS.U.PP.SS.............S",
+                "SUS......SSS....PP......S",
+                "S.UW.W...UUU............S",
+                "S......W....DPP.WPP..P..S",
+                "SPWPPPP..W..SP..........S",
+                "S.......W...SPWWW.....P.S",
+                "S.W..W......S.P.........S",
+                "S..W....W.S.S....WWWWWW.S",
+                "S.....W...SDS.P.........S",
+                "S..W...W..SSSPPP.P..WWWd.S",
+                "SP........SSS...........S",
+                "S...W..WPPUSS......P....S",
+                "SP.P..W....UUPPPP.......S",
+                "S.......................S",
+                ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
 
-    mapTile = [
-        ".UUUUUUUUUUUUUUUUUUUUUUUU",
-        "S.......DDD.............S",
-        "SDDDDDD.SSS............ S",
-        "SSSSSSS.SSS.....PPP...P.S",
-        "SUSSSSU.SSS........W....S",
-        "SSSUSU..USS.PP.......PPPS",
-        "SSS.U.PP.SS.............S",
-        "SUS......SSS....PP......S",
-        "S.UW.W...UUU............S",
-        "S......W....DPP.WPP..P..S",
-        "SPWPPPP..W..SP..........S",
-        "S.......W...SPWWW.....P.S",
-        "S.W..W......S.P.........S",
-        "S..W....W.S.S....WWWWWW.S",
-        "S.....W...SDS.P.........S",
-        "S..W...W..SSSPPP.P..WWWd.S",
-        "SP........SSS...........S",
-        "S...W..WPPUSS......P....S",
-        "SP.P..W....UUPPPP.......S",
-        "S.......................S",
-        ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
+            ];
 
-    ];
-    if (modoUrl == 1) {
-        mapElement = [
-            ".UUUUUUUUUUUUUUUUUUUUUUUU",
-            "SE..B...DDD.......G.....S",
-            "SDDDDDD.SSS.............S",
-            "SSSSSSS.SSS.....PPP...P.S",
-            "SUSSSSU.SSS........W....S",
-            "SSSUSU..USS.PP...B...PPPS",
-            "SSS.U.PPCSS....C........S",
-            "SUS......SSS....PP......S",
-            "S.UW.W...UUU.......B....S",
-            "S...B..W....DPP.WPP..P..S",
-            "SPWPPPP..W..SP....C.....S",
-            "S...C...W...SPWWW.....P.S",
-            "S.W..W..M...S.P.........S",
-            "S..W....W.S.S....WWWWWW.S",
-            "S.....W...SDS.P.........S",
-            "S..W...W..SSSPPP.P..WWWd.S",
-            "SP....C...SSS...C.......S",
-            "S...W..WPPUSS......P....S",
-            "SP.P..W....UUPPPP...B...S",
-            "S..........B............S",
-            ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
-
-
-        ];
-    } else {
-        mapElement = [
-            ".UUUUUUUUUUUUUUUUUUUUUUUU",
-            "S...BC..DDD.......G.....S",
-            "SDDDDDD.SSS.............S",
-            "SSSSSSS.SSS.....PPP...P.S",
-            "SUSSSSU.SSS........W....S",
-            "SSSUSU..USS.PP...B...PPPS",
-            "SSS.U.PPCSS....C........S",
-            "SUS......SSS....PP......S",
-            "S.UW.W...UUU.......B....S",
-            "S...B..W....DPP.WPP..P..S",
-            "SPWPPPP..W..SP....C.....S",
-            "S...C...W...SPWWW.....P.S",
-            "S.W..W..M...S.P.........S",
-            "S..W....W.S.S....WWWWWW.S",
-            "S.....W...SDS.P.........S",
-            "S..W...W..SSSPPP.P..WWWd.S",
-            "SP....C...SSS...C.......S",
-            "S...W..WPPUSS......P....S",
-            "SP.P..W....UUPPPP...B...S",
-            "S..........B............S",
-            ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
+            mapElement = [
+                ".UUUUUUUUUUUUUUUUUUUUUUUU",
+                "SE..B...DDD.......G.....S",
+                "SDDDDDD.SSS.............S",
+                "SSSSSSS.SSS.....PPP...P.S",
+                "SUSSSSU.SSS........W....S",
+                "SSSUSU..USS.PP...B...PPPS",
+                "SSS.U.PPCSS....C........S",
+                "SUS......SSS....PP......S",
+                "S.UW.W...UUU.......B....S",
+                "S...B..W....DPP.WPP..P..S",
+                "SPWPPPP..W..SP....C.....S",
+                "S...C...W...SPWWW.....P.S",
+                "S.W..W..M...S.P.........S",
+                "S..W....W.S.S....WWWWWW.S",
+                "S.....W...SDS.P.........S",
+                "S..W...W..SSSPPP.P..WWWd.S",
+                "SP....C...SSS...C.......S",
+                "S...W..WPPUSS......P....S",
+                "SP.P..W....UUPPPP...B...S",
+                "S..........B............S",
+                ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
 
 
-        ];
-        for (var i = 0; i < mapElement.length; i++) {
-            mapElement[i] = mapElement[i].replace(/[CME]/g, 'B');
-        }
+            ];
 
+
+            if (modoUrl == 2) {
+                for (var i = 0; i < mapElement.length; i++) {
+                    mapElement[i] = mapElement[i].replace(/[CME]/g, 'B');
+                }
+
+            }
+
+
+
+            break;
+        case '2':
+            mapTile = [
+                ".UUUUUUUUUUUUUUUUUUUUUUUU",
+                "S.......................S",
+                "SWWW...DWWW....DWWWWWWW S",
+                "S....PPS....PPPS........S",
+                "S..W...U.......UPPP.....S",
+                "S.......PPP..PP.....D...S",
+                "SWWDWW..............S..WS",
+                "S..S......PPPPPP...S....S",
+                "S..S...W...PPP......S..PS",
+                "SW.U...W....W....UWWW...S",
+                "S.......PP.......PP.... S",
+                "S..PDPPP...WWWWW...W...PS",
+                "S...S...............WWWWS",
+                "SW..U.W..D....W..PP....S",
+                "S.........S............WS",
+                "S...WW....U.WDW...W.....S",
+                "S............S......W...S",
+                "S..WW...W....S......W...S",
+                "S..........WWU.....PP.. S",
+                "S......WW.......PPPP..WWS",
+                "SWWWW.....PPPP..........S",
+                "S.................P...W.S",
+                "S.....WWW......P....... S",
+                "S..........PP..W..P.....S",
+                "S.PPPP...WW.........PPP..S",
+                "S............W..PPP......S",
+                "SWWWWWWWWWWWD.......PPP. S",
+                "S...........U.P.WWWWWWWWS",
+                "S...........U..P........S",
+                ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
+
+            ];
+            mapElement = [
+                ".UUUUUUUUUUUUUUUUUUUUUUUU",
+                "S....B......E...C....B..S",
+                "SWWW...DWWW....DWWWWWWW S",
+                "S....PPS.B..PPPS..E..C..S",
+                "S..W...U.......UPPP...C.S",
+                "S.......PPP..PP.M...D...S",
+                "SWWDWW..B....C...C..S..WS",
+                "S..S...C..PPPPPP...S..B.S",
+                "S..S...W.B.PPP...C..S..PS",
+                "SW.U.C.W....W..M.UWWW.B.S",
+                "S.......PP.......PP.... S",
+                "S..PDPPP...WWWWW...W...PS",
+                "S...S....B..B.......WWWWS",
+                "SW..U.W..D....W..PP....S",
+                "S.........S.....M..B..WS",
+                "S...WW..B.U.WDW...W.....S",
+                "S.....C...C..S...B..W.B.S",
+                "S..WW...W....S..B...W...S",
+                "S..........WWU.....PP.B S",
+                "S..C...WW.......PPPP..WWS",
+                "SWWWW.....PPPP.B........S",
+                "S.........BB..E...P...W.S",
+                "S..C..WWW......P....... S",
+                "S..........PP..W..P.....S",
+                "S.PPPP.C.WW.........PPP..S",
+                "S............W..PPP......S",
+                "SWWWWWWWWWWWD.......PPP. S",
+                "S...........U.P.WWWWWWWWS",
+                "S...........U..P....G...S",
+                ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
+
+            ];
+            if (modoUrl == 2) {
+
+                for (var i = 0; i < mapElement.length; i++) {
+                    mapElement[i] = mapElement[i].replace(/[CME]/g, 'B');
+                }
+
+            }
+            break;
+        case '3':
+            mapTile = [
+                ".UUUUUUUUUUUUUUUUUUUUUUUU",
+                "S..........W..W.........S",
+                "S...PPPPP...PP...PPW....S",
+                "SW...PP...P.....D....W.WS",
+                "S...P..W..PPPP..S......S",
+                "SW...........W..S....PP.S",
+                "S....W.W..W...P.W..W....S",
+                "S.......P..P...P.P......S",
+                "S...D..W....W..P...WWPPP.S",
+                "SW..S....PPP.....P.....WS",
+                "S...S.....P....W.PP.....S",
+                "S...S.W.....P.........W.S",
+                "S...U.....P..W.P..W..W.DS",
+                "S.......W..W...W.P.....SS",
+                "SWWWWWWW....PP.....W...US",
+                "S.......................S",
+                ".DDDDDDDDDDDDDDDDDDDDDDD."
+
+            ];
+
+            mapElement = [
+                ".UUUUUUUUUUUUUUUUUUUUUUUU",
+                "S.C......B.W..W.B.......S",
+                "S...PPPPP...PP...PPW.C..S",
+                "SW...PP...P.....D....W.WS",
+                "S...P..W..PPPP..S..C...S",
+                "SW....E...B..W..S....PP.S",
+                "S.C..W.W..WE..P.W..W.B..S",
+                "S.......P..P.C.P.P......S",
+                "S...D..W..C.W..PB..WWPPP.S",
+                "SW..S....PPP.C...P..B..WS",
+                "S...S...M.P....W.PP.....S",
+                "S.C.S.W.C...P...B.....W.S",
+                "S...U.....P..W.P..W..W.DS",
+                "S.......W..W...W.P.B...SS",
+                "SWWWWWWW....PP..C..W...US",
+                "S......M....C......B...GS",
+                ".DDDDDDDDDDDDDDDDDDDDDDD."
+
+            ];
+
+
+            if (modoUrl == 2) {
+                for (var i = 0; i < mapElement.length; i++) {
+                    mapElement[i] = mapElement[i].replace(/[CME]/g, 'B');
+                }
+
+            }
+
+
+
+            break;
     }
 } else if (dificultadUrl == 2) {
+    switch (escenarioUrl) {
+        case '1':
+            mapTile = [
+                ".UUUUUUUUUUUUUUUUUUUUUUUU",
+                "S.......DDD.............S",
+                "SDDDDDD.SSS............ S",
+                "SSSSSSS.SSS.....PPP...P.S",
+                "SUSSSSU.SSS........W....S",
+                "SSSUSU..USS.PP.......PPPS",
+                "SSS.U.PP.SS.............S",
+                "SUS......SSS....PP......S",
+                "S.UW.W...UUU............S",
+                "S......W....DPP.WPP..P..S",
+                "SPWPPPP..W..SP..........S",
+                "S.......W...SPWWW.....P.S",
+                "S.W..W......S.P.........S",
+                "S..W....W.S.S....WWWWWW.S",
+                "S.....W...SDS.P.........S",
+                "S..W...W..SSSPPP.P..WWWd.S",
+                "SP........SSS...........S",
+                "S...W..WPPUSS......P....S",
+                "SP.P..W....UUPPPP.......S",
+                "S.......................S",
+                ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
 
-    mapTile = [
-        ".UUUUUUUUUUUUUUUUUUUUUUUU",
-        "S.......DDD.............S",
-        "SDDDDDD.SSS.PPPPPPPPPP. S",
-        "SSSSSSS.SSS.....PPP...P.S",
-        "SUSSSSU.SSS........W....S",
-        "SSSUSU..USS.PPPPPP...PPPS",
-        "SSS.U.PP.SS.............S",
-        "SUS......SSS....PP......S",
-        "S.UW.W...UUU............S",
-        "S......W....DPP.WPP..P..S",
-        "SPWPPPP..W..SP..........S",
-        "S.......W...SPWWWWWWW.P.S",
-        "S....W......S.P.........S",
-        "S..W.,....S.S....WWWWWW.S",
-        "S.....W...SDS.P.........S",
-        "S..W...W..SSSPPP.P..WWWd.S",
-        "SP........SSS...........S",
-        "S...W..WPPUSS......P....S",
-        "SP.P..W....UUPPPP.......S",
-        "S.......................S",
-        ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
+            ];
 
-    ];
-    if (modoUrl == 1) {
-
-        mapElement = [
-            ".UUUUUUUUUUUUUUUUUUUUUUUU",
-            "SE..B...DDD.......G..B..S",
-            "SDDDDDD.SSS...B.........S",
-            "SSSSSSS.SSS.....PPP...P.S",
-            "SUSSSSU.SSS........W....S",
-            "SSSUSU..USS.PP...B...PPPS",
-            "SSS.U.PPCSS....C.....B..S",
-            "SUS...B..SSS....PP......S",
-            "S.UW.W...UUU.......B....S",
-            "S...B..W....DPP.WPP..P..S",
-            "SPWPPPP..W..SP....C.....S",
-            "S...C...W...SPWWW..C..P.S",
-            "S.W..W..M...S.P.........S",
-            "S..W....W.S.S....WWWWWW.S",
-            "S.C...W...SDS.P.........S",
-            "S..W...W..SSSPPP.P..WWWd.S",
-            "SP.M..C...SSS...C....C..S",
-            "S...W..WPPUSS......P....S",
-            "SP.P..W....UUPPPP...B...S",
-            "S.....C....B............S",
-            ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
-
-
-        ];
-    } else {
-        mapElement = [
-            ".UUUUUUUUUUUUUUUUUUUUUUUU",
-            "SE..B...DDD.......G..B..S",
-            "SDDDDDDBSSS...B.........S",
-            "SSSSSSS.SSS.....PPP...P.S",
-            "SUSSSSUCSSS........W....S",
-            "SSSUSU..USS.PP...B...PPPS",
-            "SSS.U.PPCSS....C.....B..S",
-            "SUS...B..SSS....PP......S",
-            "S.UW.W...UUU.......B....S",
-            "S...B..W....DPP.WPP..P..S",
-            "SPWPPPP..W..SP....C.....S",
-            "S...C...W...SPWWW..C..P.S",
-            "S.W..W..M...S.P.........S",
-            "S..W....W.S.S....WWWWWW.S",
-            "S.C...W...SDS.P.........S",
-            "S..W...W..SSSPPP.P..WWWd.S",
-            "SP.M..C...SSS...C....C..S",
-            "S...W..WPPUSS......P....S",
-            "SP.P..W....UUPPPP...B...S",
-            "S.....C....B............S",
-            ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
+            mapElement = [
+                ".UUUUUUUUUUUUUUUUUUUUUUUU",
+                "SE..B...DDD.......G.....S",
+                "SDDDDDD.SSS.............S",
+                "SSSSSSS.SSS.....PPP...P.S",
+                "SUSSSSU.SSS........W....S",
+                "SSSUSU..USS.PP...B...PPPS",
+                "SSS.U.PPCSS....C....E...S",
+                "SUS......SSS....PP...E..S",
+                "S.UW.W...UUU.......B....S",
+                "S...B..W....DPP.WPP..P..S",
+                "SPWPPPP..W..SP....C.....S",
+                "S...C...W...SPWWW...E.P.S",
+                "S.W..W..M...S.P.........S",
+                "S..W....W.S.S....WWWWWW.S",
+                "S.....W...SDS.P....E....S",
+                "S..W...W..SSSPPP.P..WWWd.S",
+                "SP....C...SSS...C.......S",
+                "S...W..WPPUSS....E.P....S",
+                "SP.P..W....UUPPPP...B...S",
+                "S....E.....B.....E......S",
+                ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
 
 
-        ];
+            ];
 
-        for (var i = 0; i < mapElement.length; i++) {
-            mapElement[i] = mapElement[i].replace(/[CM]/g, 'B');
-        }
+            if (modoUrl == 2) {
+                for (var i = 0; i < mapElement.length; i++) {
+                    mapElement[i] = mapElement[i].replace(/[CM]/g, 'B');
+                }
+            }
 
 
+            break;
+        case '2':
+            mapTile = [
+                ".UUUUUUUUUUUUUUUUUUUUUUUU",
+                "S.......................S",
+                "SWWW...DWWW....DWWWWWWW S",
+                "S....PPS....PPPS........S",
+                "S..W...U.......UPPP.....S",
+                "S.......PPP..PP.....D...S",
+                "SWWDWW..............S..WS",
+                "S..S......PPPPPP...S....S",
+                "S..S...W...PPP......S..PS",
+                "SW.U...W....W....UWWW...S",
+                "S.......PP.......PP.... S",
+                "S..PDPPP...WWWWW...W...PS",
+                "S...S...............WWWWS",
+                "SW..U.W..D....W..PP....S",
+                "S.........S............WS",
+                "S...WW....U.WDW...W.....S",
+                "S............S......W...S",
+                "S..WW...W....S......W...S",
+                "S..........WWU.....PP.. S",
+                "S......WW.......PPPP..WWS",
+                "SWWWW.....PPPP..........S",
+                "S.................P...W.S",
+                "S.....WWW......P....... S",
+                "S..........PP..W..P.....S",
+                "S.PPPP...WW.........PPP..S",
+                "S............W..PPP......S",
+                "SWWWWWWWWWWWD.......PPP. S",
+                "S...........U.P.WWWWWWWWS",
+                "S...........U..P........S",
+                ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
+
+            ];
+            mapElement = [
+                ".UUUUUUUUUUUUUUUUUUUUUUUU",
+                "S....B......E...C....B..S",
+                "SWWW...DWWW....DWWWWWWW S",
+                "S....PPS.B..PPPS..E..C..S",
+                "S..W...U.......UPPP...C.S",
+                "S....E..PPP..PP.M...D...S",
+                "SWWDWW..B....C...C..S..WS",
+                "S..S...C..PPPPPP...S..B.S",
+                "S..S...W.B.PPP...C..S..PS",
+                "SW.U.C.W....W..M.UWWW.B.S",
+                "S...E...PP.......PP.... S",
+                "S..PDPPP...WWWWW...W...PS",
+                "S...S..E.B..B.......WWWWS",
+                "SW..U.W..D....W..PP....S",
+                "S.........S.....M..B..WS",
+                "S...WW..B.U.WDW...W.....S",
+                "S.....C.E.C..S...B..W.B.S",
+                "S..WW...W....S..B...W...S",
+                "S..........WWU.....PP.B S",
+                "S..C...WW.......PPPP..WWS",
+                "SWWWW...E.PPPP.B........S",
+                "S.........BB..E...P...W.S",
+                "S..C..WWW......P....... S",
+                "S..........PP..W..P.....S",
+                "S.PPPP.C.WW.........PPP..S",
+                "S....E.......W..PPP......S",
+                "SWWWWWWWWWWWD.......PPP. S",
+                "S...........U.P.WWWWWWWWS",
+                "S...........U..P....G...S",
+                ".DDDDDDDDDDDDDDDDDDDDDDDDDD"
+
+            ];
+            if (modoUrl == 2) {
+
+                for (var i = 0; i < mapElement.length; i++) {
+                    mapElement[i] = mapElement[i].replace(/[CM]/g, 'B');
+                }
+
+            }
+            break;
+        case '3':
+            mapTile = [
+                ".UUUUUUUUUUUUUUUUUUUUUUUU",
+                "S..........W..W.........S",
+                "S...PPPPP...PP...PPW....S",
+                "SW...PP...P.....D....W.WS",
+                "S...P..W..PPPP..S......S",
+                "SW...........W..S....PP.S",
+                "S....W.W..W...P.W..W....S",
+                "S.......P..P...P.P......S",
+                "S...D..W....W..P...WWPPP.S",
+                "SW..S....PPP.....P.....WS",
+                "S...S.....P....W.PP.....S",
+                "S...S.W.....P.........W.S",
+                "S...U.....P..W.P..W..W.DS",
+                "S.......W..W...W.P.....SS",
+                "SWWWWWWW....PP.....W...US",
+                "S.......................S",
+                ".DDDDDDDDDDDDDDDDDDDDDDD."
+
+            ];
+
+            mapElement = [
+                ".UUUUUUUUUUUUUUUUUUUUUUUU",
+                "S.C......B.W..W.B..E....S",
+                "S...PPPPP...PP...PPW.C..S",
+                "SW...PP...P.....D.E..W.WS",
+                "S...P..W..PPPP..S..C...S",
+                "SW....E...B..W..S....PP.S",
+                "S.C..W.W..WE..P.W..W.B..S",
+                "S.......P..P.C.P.P......S",
+                "S...D..W..C.W..PB..WWPPP.S",
+                "SW..S....PPP.C...P..B..WS",
+                "S...S...M.P.E..W.PP.....S",
+                "S.C.S.W.C...P...B...E.W.S",
+                "S...U.....P..W.P..W..W.DS",
+                "S.......W..W...W.P.B...SS",
+                "SWWWWWWW....PP..C..W...US",
+                "S......M....C......B...GS",
+                ".DDDDDDDDDDDDDDDDDDDDDDD."
+
+            ];
+
+
+            if (modoUrl == 2) {
+                for (var i = 0; i < mapElement.length; i++) {
+                    mapElement[i] = mapElement[i].replace(/[CM]/g, 'B');
+                }
+
+            }
+
+
+
+            break;
     }
 }
 

@@ -17,7 +17,7 @@ export class players {
         this.ySpeed = 0;
         this.xSpeed = 0;
         this.xAcceleration = 25;
-        this.maxSpeed = 25;
+        this.maxSpeed = 30;
         this.touchFloorWall = false;
         this.touchFloor = false;
         this.touchWall = false;

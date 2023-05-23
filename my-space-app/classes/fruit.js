@@ -19,11 +19,11 @@ export class fruit extends platform {
 
     }
     effectSpeed(player1) {
-        const maxSpeedOriginal = 25; // Guardar el valor original de maxSpeed
-        player1.maxSpeed = 40; // Establecer un nuevo valor para maxSpeed durante 3 segundos
+        const maxSpeedOriginal = 30; // Guardar el valor original de maxSpeed
+        player1.maxSpeed = 65; // Establecer un nuevo valor para maxSpeed durante 3 segundos
         setTimeout(() => {
             player1.maxSpeed = maxSpeedOriginal; // Restaurar el valor original de maxSpeed
-        }, 3000); // Esperar 3 segundos antes de restaurar el valor original
+        }, 6500); // Esperar 8 segundos antes de restaurar el valor original
     }
     effectLife(player1) {
         player1.life = player1.life + 1;
